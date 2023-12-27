@@ -5,6 +5,8 @@ const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
 const protect = require("./middlewares/authMiddleware");
+require("colors");
+
 dotenv.config();
 connectDB();
 const app = express();
