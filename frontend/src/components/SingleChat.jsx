@@ -22,7 +22,13 @@ import io from "socket.io-client";
 const ENDPOINT = "http://localhost:5500";
 var socket, selectedChatCompare, timeout;
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-    const { user, selectedChat, setSelectedChat } = ChatState();
+    const {
+        user,
+        selectedChat,
+        setSelectedChat,
+        notifications,
+        setNotifications,
+    } = ChatState();
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState();
@@ -52,7 +58,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         socket.on("stop typing", () => {
             setIsTyping(false);
         });
-    }, []);
+    }, [user]);
     const fetchMessages = async () => {
         if (!selectedChat) {
             return;
@@ -97,7 +103,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 !selectedChatCompare ||
                 selectedChatCompare._id !== newMessageReceived.chat._id
             ) {
-                //give notification
+                if (!notifications.includes(newMessageReceived)) {
+                    setNotifications([newMessageReceived, ...notifications]);
+                    setFetchAgain(!fetchAgain);
+                }
             } else {
                 setMessages([...messages, newMessageReceived]);
             }
@@ -153,6 +162,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
         }, timerLength);
     };
+    console.log("noti", notifications);
     return (
         <>
             {selectedChat ? (
