@@ -16,7 +16,7 @@ router.use("/group", groupRouter);
 groupRouter.route("/").post(createGroupChat);
 groupRouter.route("/rename").put(renameGroup);
 groupRouter.route("/addMember").put(addToGroup);
-groupRouter.route("/removeMember").delete(removeFromGroup);
+groupRouter.route("/removeMember").put(removeFromGroup);
 
 // router.route('/rename').put(createGroupChat)
 module.exports = router;
