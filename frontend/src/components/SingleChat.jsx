@@ -17,12 +17,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./styles.css";
 import ScrollableChats from "./ScrollableChats.jsx";
+import io from "socket.io-client";
 
+const ENDPOINT = "http://localhost:5500";
+var socket, selectedChatCompare, timeout;
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const { user, selectedChat, setSelectedChat } = ChatState();
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState();
+    const [typing, setTyping] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
+    const [socketConnected, setSocketConnected] = useState(false);
     const toast = useToast();
     const config = useMemo(
         () => ({
@@ -34,6 +40,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         [user.token],
     );
 
+    useEffect(() => {
+        socket = io(ENDPOINT);
+        socket.emit("setup", user);
+        socket.on("connected", () => {
+            setSocketConnected(true);
+        });
+        socket.on("typing", () => {
+            setIsTyping(true);
+        });
+        socket.on("stop typing", () => {
+            setIsTyping(false);
+        });
+    }, []);
     const fetchMessages = async () => {
         if (!selectedChat) {
             return;
@@ -46,6 +65,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             );
             setMessages(data);
             console.log(data);
+            socket.emit("join chat", selectedChat._id);
             setLoading(false);
         } catch (e) {
             console.log(e);
@@ -68,11 +88,27 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     useEffect(() => {
         selectedChat && fetchMessagesCallback();
+        selectedChatCompare = selectedChat;
     }, [selectedChat, fetchMessagesCallback]);
+
+    useEffect(() => {
+        socket.on("message received", (newMessageReceived) => {
+            if (
+                !selectedChatCompare ||
+                selectedChatCompare._id !== newMessageReceived.chat._id
+            ) {
+                //give notification
+            } else {
+                setMessages([...messages, newMessageReceived]);
+            }
+        });
+    });
 
     const sendMessage = async (event) => {
         if (event.key === "Enter" && newMessage) {
             try {
+                socket.emit("stop typing", selectedChat._id);
+                setTyping(false);
                 const { data } = await axios.post(
                     "/api/message",
                     {
@@ -84,6 +120,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 console.log(data);
                 setNewMessage("");
                 setMessages([...messages, data]);
+                socket.emit("new message", data);
             } catch (e) {
                 toast({
                     title: "error Occurred!",
@@ -97,6 +134,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     };
     const typingHandler = (e) => {
         setNewMessage(e.target.value);
+        if (!socketConnected) {
+            return;
+        }
+        if (!typing) {
+            setTyping(true);
+            socket.emit("typing", selectedChat._id);
+        }
+        let lastTypingTime = new Date().getTime();
+        let timerLength = 3000;
+        timeout && clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            let timeNow = new Date().getTime();
+            let timeDiff = timeNow - lastTypingTime;
+            if (timeDiff >= timerLength && typing) {
+                socket.emit("stop typing", selectedChat._id);
+                setTyping(false);
+            }
+        }, timerLength);
     };
     return (
         <>
@@ -159,6 +214,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             </div>
                         )}
                         <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+                            {isTyping ? (
+                                <Text fontSize={"xl"}>is typing...</Text>
+                            ) : (
+                                <></>
+                            )}
                             <Input
                                 variant={"filled"}
                                 bg={"#e0e0e0"}
