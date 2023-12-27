@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap');
+
+.App{
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+    background-color: #e5e5e5;
+}
+button{
+    box-shadow: none !important;
+    outline: none !important;
+    border:none !important;
+}
