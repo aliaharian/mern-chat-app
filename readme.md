@@ -98,7 +98,6 @@ mern-chat-app/
 - `express-async-handler`: Handle async functions in Express.
 - `jsonwebtoken`: JWT authentication.
 - `mongoose`: MongoDB object modeling.
-- `nodemon`: Monitor for changes and automatically restart the server.
 
 ### Frontend
 
