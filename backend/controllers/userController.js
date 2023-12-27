@@ -56,6 +56,7 @@ const allUsers = asyncHandler(async (req, res) => {
     let keyword;
 
     if (req.query.search) {
+        console.log("found!");
         keyword = {
             $or: [
                 { name: { $regex: req.query.search, $options: "i" } },
