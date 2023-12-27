@@ -47,6 +47,7 @@ mern-chat-app/
 
    cd ../
    npm install
+   npm prepare #install husky configuration for development
    ```
 
 ## Configuration
