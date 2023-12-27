@@ -12,9 +12,9 @@ connectDB();
 const app = express();
 app.use(express.json());
 
-app.get("/", function (req, res) {
-    res.send("API is running successfully");
-});
+// app.get("/", function (req, res) {
+//     res.send("API is running successfully");
+// });
 app.use("/api/user", userRoutes);
 app.use(protect).use("/api/chat", chatRoutes);
 
