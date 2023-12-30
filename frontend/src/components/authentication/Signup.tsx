@@ -23,7 +23,7 @@ const Signup = () => {
     const toast = useToast();
     const history = useHistory();
     const { mutate, loading: apiLoading } = useSignup();
-    const postDetails = (pics) => {
+    const postDetails = (pics?: File) => {
         setLoading(true);
         if (pics === undefined) {
             toast({
@@ -174,7 +174,7 @@ const Signup = () => {
                 <Input
                     type={"file"}
                     onChange={(e) => {
-                        postDetails(e.target.files[0]);
+                        postDetails(e.target.files?.[0]);
                     }}
                 />
             </FormControl>
