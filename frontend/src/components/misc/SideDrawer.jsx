@@ -143,7 +143,7 @@ const SideDrawer = () => {
                 </Tooltip>
 
                 <Text fontSize={"2xl"} fontFamily={"Work Sans"}>
-                    Chat App
+                    Echo Talk!
                 </Text>
 
                 <div style={{ display: "flex", alignItems: "center" }}>

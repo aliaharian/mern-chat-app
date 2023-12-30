@@ -19,7 +19,7 @@ import "./styles.css";
 import ScrollableChats from "./ScrollableChats.jsx";
 import io from "socket.io-client";
 
-const ENDPOINT = "http://localhost:5500";
+const ENDPOINT = import.meta.env.VITE_SOCKET_URL || "http://localhost:5500";
 var socket, selectedChatCompare, timeout;
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const {

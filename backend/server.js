@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "production") {
 
     app.get("*", (req, res) =>
         res.sendFile(
-            path.resolve(__dirname1, "frontend", "build", "index.html"),
+            path.resolve(__dirname1, "frontend", "dist", "index.html"),
         ),
     );
 } else {
@@ -43,7 +43,7 @@ const server = app.listen(port, console.log(`live on ${port}`.yellow.bold));
 const io = require("socket.io")(server, {
     pingTimeout: 60000,
     cors: {
-        origin: "http://127.0.0.1:5173",
+        origin: ["http://127.0.0.1:5173", "https://chat.tourino.ir"],
     },
 });
 
