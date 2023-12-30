@@ -6,8 +6,8 @@ const {
 } = require("../controllers/messageControllers");
 
 const router = express.Router();
+const protect = require("../middlewares/authMiddleware");
 
-router.route("/").get(fetchMessages).post(sendMessage);
+router.route("/").get(protect, fetchMessages).post(protect, sendMessage);
 
-// router.route('/rename').put(createGroupChat)
 module.exports = router;

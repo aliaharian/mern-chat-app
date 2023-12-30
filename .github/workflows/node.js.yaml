@@ -1,0 +1,31 @@
+name: node.js CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    runs-on: self-hosted
+
+    steps:
+      - name: define nodejs
+        run: |
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
+      - name: Install Dependencies and Lint Backend
+        run: |
+          npm install
+          npm run lint-fix
+      - name: Install Dependencies and Lint Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run lint-fix
+          npm run build
+          cd ../
+
+
+
