@@ -16,15 +16,21 @@ jobs:
         run: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
-      - name: Install Dependencies and Lint Backend
+      - name: Install Dependencies and Lint Backend and Frontend
         run: |
           npm install
-          npm run lint-fix
-      - name: Install Dependencies and Lint Frontend
-        run: |
           cd frontend
           npm install
+          cd ../
+      - name: linting
+        run: |
           npm run lint-fix
+          cd frontend
+          npm run lint-fix
+          cd ../
+      - name: build Frontend
+        run: |
+          cd frontend
           npm run build
           cd ../
 
