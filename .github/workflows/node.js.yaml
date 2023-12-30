@@ -5,11 +5,13 @@ on:
     branches: [ master ]
 
 jobs:
-  lint:
+  deployChat:
     runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       - name: define nodejs
         run: |
           export NVM_DIR=~/.nvm
@@ -31,6 +33,9 @@ jobs:
           cd frontend
           npm run build
           cd ../
+      - name: restart pm2
+        run: |
+          pm2 restart chatApp
 
 
 
