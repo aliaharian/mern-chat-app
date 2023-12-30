@@ -1,23 +1,24 @@
 import {
     Avatar,
+    Badge,
     Box,
-    Drawer,
     Button,
+    Drawer,
+    DrawerBody,
+    DrawerContent,
+    DrawerHeader,
+    DrawerOverlay,
+    Input,
     Menu,
     MenuButton,
     MenuDivider,
     MenuItem,
     MenuList,
+    Spinner,
     Text,
     Tooltip,
     useDisclosure,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerHeader,
-    DrawerBody,
-    Input,
     useToast,
-    Spinner,
 } from "@chakra-ui/react";
 import { Alarm, ArrowDown2, SearchNormal } from "iconsax-react";
 import { useState } from "react";
@@ -27,13 +28,21 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import ChatLoading from "../ChatLoading.jsx";
 import UserListItem from "../userAvatar/UserListItem.jsx";
+import { getSender } from "../../config/chatLogics.js";
 
 const SideDrawer = () => {
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingChat, setLoadingChat] = useState();
-    const { user, setSelectedChat, chats, setChats } = ChatState();
+    const {
+        user,
+        setSelectedChat,
+        chats,
+        setChats,
+        notifications,
+        setNotifications,
+    } = ChatState();
     const history = useHistory();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
@@ -140,11 +149,41 @@ const SideDrawer = () => {
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <Menu>
                         <MenuButton p={1}>
+                            {notifications?.length > 0 && (
+                                <Badge
+                                    position={"absolute"}
+                                    colorScheme={"red"}
+                                >
+                                    {notifications.length}
+                                </Badge>
+                            )}
                             <Alarm />
                         </MenuButton>
-                        {/*<MenuList>*/}
-                        {/*    */}
-                        {/*</MenuList>*/}
+                        <MenuList pl={2}>
+                            {!notifications.length && "no new messages"}
+                            {notifications?.map((notif) => (
+                                <MenuItem
+                                    key={notif._id}
+                                    onClick={() => {
+                                        setSelectedChat(notif.chat);
+                                        setNotifications(
+                                            notifications.filter(
+                                                (n) =>
+                                                    n.chat._id !==
+                                                    notif.chat._id,
+                                            ),
+                                        );
+                                    }}
+                                >
+                                    {notif.chat.isGroupChat
+                                        ? `new message in ${notif.chat.chatName}`
+                                        : `new message from ${
+                                              getSender(user, notif.chat.users)
+                                                  .name
+                                          }: ${notif.content}`}
+                                </MenuItem>
+                            ))}
+                        </MenuList>
                     </Menu>
                     <Menu>
                         <MenuButton
