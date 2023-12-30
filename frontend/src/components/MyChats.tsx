@@ -3,9 +3,9 @@ import { ChatState } from "../context/chatState.js";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { Add } from "iconsax-react";
-import ChatLoading from "./ChatLoading.jsx";
+import ChatLoading from "./ChatLoading.tsx";
 import { getSender } from "../config/chatLogics.js";
-import GroupChatModal from "./misc/GroupChatModal.jsx";
+import GroupChatModal from "./misc/GroupChatModal.js";
 import PropTypes from "prop-types";
 
 const MyChats = ({ fetchAgain }) => {

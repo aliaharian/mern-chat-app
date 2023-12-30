@@ -8,8 +8,8 @@ import {
     Tabs,
     Text,
 } from "@chakra-ui/react";
-import Login from "../components/authentication/Login.jsx";
-import Signup from "../components/authentication/Signup.jsx";
+import Login from "../components/authentication/Login.tsx";
+import Signup from "../components/authentication/Signup.tsx";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
 

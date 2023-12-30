@@ -11,16 +11,16 @@ import {
 } from "@chakra-ui/react";
 import { ArrowLeft } from "iconsax-react";
 import { getSender } from "../config/chatLogics.js";
-import ProfileModal from "./misc/ProfileModal.jsx";
-import UpdateGroupChatModal from "./misc/UpdateGroupChatModal.jsx";
+import ProfileModal from "./misc/ProfileModal.js";
+import UpdateGroupChatModal from "./misc/UpdateGroupChatModal.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./styles.css";
-import ScrollableChats from "./ScrollableChats.jsx";
+import ScrollableChats from "./ScrollableChats.tsx";
 import io from "socket.io-client";
 
 const ENDPOINT = import.meta.env.VITE_SOCKET_URL || "http://localhost:5500";
-var socket, selectedChatCompare, timeout;
+let socket, selectedChatCompare, timeout;
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const {
         user,
@@ -150,12 +150,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             setTyping(true);
             socket.emit("typing", selectedChat._id);
         }
-        let lastTypingTime = new Date().getTime();
-        let timerLength = 3000;
+        const lastTypingTime = new Date().getTime();
+        const timerLength = 3000;
         timeout && clearTimeout(timeout);
         timeout = setTimeout(() => {
-            let timeNow = new Date().getTime();
-            let timeDiff = timeNow - lastTypingTime;
+            const timeNow = new Date().getTime();
+            const timeDiff = timeNow - lastTypingTime;
             if (timeDiff >= timerLength && typing) {
                 socket.emit("stop typing", selectedChat._id);
                 setTyping(false);
