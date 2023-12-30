@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          persist-credentials: false
+          clean: false
       - name: define nodejs
         run: |
           export NVM_DIR=~/.nvm
