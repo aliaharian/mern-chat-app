@@ -1,4 +1,4 @@
-import { ChatState } from "../context/ChatState.js";
+import { ChatState } from "../context/chatState.js";
 import { Box } from "@chakra-ui/react";
 import SingleChat from "./SingleChat.jsx";
 import PropTypes from "prop-types";

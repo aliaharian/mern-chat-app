@@ -23,7 +23,7 @@ import axios from "axios";
 import UserListItem from "../userAvatar/UserListItem.jsx";
 import UserBadgeItem from "../userAvatar/UserBadgeItem.jsx";
 import PropTypes from "prop-types";
-import { ChatState } from "../../context/ChatState.js";
+import { ChatState } from "../../context/chatState.js";
 import { Eye } from "iconsax-react";
 
 const UpdateGroupChatModal = () =>
