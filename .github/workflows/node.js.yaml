@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Install Dependencies and Lint Backend
         run: |
-            npm install
-            npm run lint-fix
+          npm install
+          npm run lint-fix
       - name: Install Dependencies and Lint Frontend
         run: |
           cd frontend
