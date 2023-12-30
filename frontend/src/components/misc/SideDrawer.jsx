@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { Alarm, ArrowDown2, SearchNormal } from "iconsax-react";
 import { useState } from "react";
-import { ChatState } from "../../context/ChatState.js";
+import { ChatState } from "../../context/chatState.js";
 import ProfileModal from "./ProfileModal.jsx";
 import { useHistory } from "react-router-dom";
 import axios from "axios";

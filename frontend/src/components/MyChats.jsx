@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChatState } from "../context/ChatState.js";
+import { ChatState } from "../context/chatState.js";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { Add } from "iconsax-react";
