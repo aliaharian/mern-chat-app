@@ -15,15 +15,18 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [show, setShow] = useState(false);
-    const { mutate, loading } = useLogin()
+    const { mutate, loading } = useLogin();
     const history = useHistory();
     const handleSubmit = async () => {
-        mutate({ email, password }, {
-            onSuccess: (data) => {
-                localStorage.setItem("userInfo", JSON.stringify(data));
-                history.push("/chats");
-            }
-        })
+        mutate(
+            { email, password },
+            {
+                onSuccess: (data) => {
+                    localStorage.setItem("userInfo", JSON.stringify(data));
+                    history.push("/chats");
+                },
+            },
+        );
     };
     return (
         <VStack spacing={"5px"}>

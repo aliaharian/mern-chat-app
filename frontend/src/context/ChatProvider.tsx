@@ -1,28 +1,34 @@
-import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from "react";
+import {
+    Dispatch,
+    ReactNode,
+    SetStateAction,
+    createContext,
+    useEffect,
+    useState,
+} from "react";
 import { useHistory } from "react-router-dom";
+import { Chat, Message, User } from "../types/types";
 
 interface ChatContextType {
     user: User | undefined;
     setUser: Dispatch<SetStateAction<User | undefined>>;
     selectedChat: Chat | undefined;
     setSelectedChat: Dispatch<SetStateAction<Chat | undefined>>;
-    chats: Chat[] | undefined,
+    chats: Chat[] | undefined;
     setChats: Dispatch<SetStateAction<Chat[]>>;
-    notifications: Message[] | undefined,
+    notifications: Message[] | undefined;
     setNotifications: Dispatch<SetStateAction<Message[]>>;
-
 }
-
 
 export const ChatContext = createContext<ChatContextType>({
     user: undefined,
-    setUser: () => { },
+    setUser: () => {},
     selectedChat: undefined,
-    setSelectedChat: () => { },
+    setSelectedChat: () => {},
     chats: undefined,
-    setChats: () => { },
+    setChats: () => {},
     notifications: undefined,
-    setNotifications: () => { }
+    setNotifications: () => {},
 });
 
 const ChatProvider = ({ children }: { children: ReactNode }) => {
@@ -32,7 +38,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
     const [notifications, setNotifications] = useState<Message[]>([]);
     const history = useHistory();
 
-    console.log("s", selectedChat)
+    console.log("s", selectedChat);
     useEffect(() => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         setUser(userInfo);
