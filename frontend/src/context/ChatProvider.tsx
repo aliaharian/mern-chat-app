@@ -1,18 +1,40 @@
-import { createContext, useEffect, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import PropTypes from "prop-types";
 
-export const ChatContext = createContext();
+interface ChatContextType {
+    user: User | undefined;
+    setUser: Dispatch<SetStateAction<User | undefined>>;
+    selectedChat: Chat | undefined;
+    setSelectedChat: Dispatch<SetStateAction<Chat | undefined>>;
+    chats: Chat[] | undefined,
+    setChats: Dispatch<SetStateAction<Chat[]>>;
+    notifications: Message[] | undefined,
+    setNotifications: Dispatch<SetStateAction<Message[]>>;
 
-const ChatProvider = ({ children }) => {
-    const [user, setUser] = useState();
-    const [selectedChat, setSelectedChat] = useState();
-    const [chats, setChats] = useState([]);
-    const [notifications, setNotifications] = useState([]);
+}
+
+
+export const ChatContext = createContext<ChatContextType>({
+    user: undefined,
+    setUser: () => { },
+    selectedChat: undefined,
+    setSelectedChat: () => { },
+    chats: undefined,
+    setChats: () => { },
+    notifications: undefined,
+    setNotifications: () => { }
+});
+
+const ChatProvider = ({ children }: { children: ReactNode }) => {
+    const [user, setUser] = useState<User>();
+    const [selectedChat, setSelectedChat] = useState<Chat>();
+    const [chats, setChats] = useState<Chat[]>([]);
+    const [notifications, setNotifications] = useState<Message[]>([]);
     const history = useHistory();
 
+    console.log("s", selectedChat)
     useEffect(() => {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
         setUser(userInfo);
         console.log("called", userInfo);
         if (!userInfo) {
@@ -37,7 +59,4 @@ const ChatProvider = ({ children }) => {
     );
 };
 
-ChatProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-};
 export default ChatProvider;
