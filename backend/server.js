@@ -43,7 +43,11 @@ const server = app.listen(port, console.log(`live on ${port}`.yellow.bold));
 const io = require("socket.io")(server, {
     pingTimeout: 60000,
     cors: {
-        origin: ["http://127.0.0.1:5173", "https://chat.tourino.ir"],
+        origin: [
+            "http://127.0.0.1:5173",
+            "http://localhost:5173",
+            "https://chat.tourino.ir",
+        ],
     },
 });
 
