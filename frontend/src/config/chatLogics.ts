@@ -1,29 +1,28 @@
-export const getSender = (loggedUser, users) => {
-    return users[0]._id === loggedUser?._id ? users[1] : users[0];
+import { Message, User } from "../types/types";
+
+export const getSender = (loggedUser: User, users: User[]): User => {
+    return users[0]._id === loggedUser._id ? users[1] : users[0];
 };
 
-export function debounce(func, delay) {
-    let timeoutId;
-
-    return function (...args) {
-        clearTimeout(timeoutId);
-
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    };
-}
-
-export const isSameSender = (messages, m, i, userId) => {
+export const isSameSender = (
+    messages: Message[],
+    m: Message,
+    i: number,
+    userId: string,
+): boolean => {
     return (
         i < messages.length - 1 &&
         (messages[i + 1].sender._id !== m.sender._id ||
-            messages[i + 1].sender._id === undefined) &&
+            !messages[i + 1].sender._id) &&
         messages[i].sender._id !== userId
     );
 };
 
-export const isLastMessage = (messages, i, userId) => {
+export const isLastMessage = (
+    messages: Message[],
+    i: number,
+    userId: string,
+) => {
     return (
         i === messages.length - 1 &&
         messages[messages.length - 1].sender._id !== userId &&

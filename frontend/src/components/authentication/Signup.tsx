@@ -46,7 +46,7 @@ const Signup = () => {
                 body: data,
             })
                 .then((res) => res.json())
-                .then((data) => {
+                .then((data: { url: string }) => {
                     setPic(data.url.toString());
                     toast({
                         title: "avatar uploaded successfully",
@@ -79,7 +79,7 @@ const Signup = () => {
             setLoading(false);
         }
     };
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         mutate(
             {
                 name,

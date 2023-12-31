@@ -29,12 +29,13 @@ import axios from "axios";
 import ChatLoading from "../ChatLoading.tsx";
 import UserListItem from "../userAvatar/UserListItem.js";
 import { getSender } from "../../config/chatLogics.js";
+import { Chat, Message, User } from "../../types/types.ts";
 
 const SideDrawer = () => {
     const [search, setSearch] = useState("");
-    const [searchResult, setSearchResult] = useState([]);
+    const [searchResult, setSearchResult] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
-    const [loadingChat, setLoadingChat] = useState();
+    const [loadingChat, setLoadingChat] = useState<boolean>(false);
     const {
         user,
         setSelectedChat,
@@ -49,7 +50,7 @@ const SideDrawer = () => {
     const config = {
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${user?.token}`,
         },
     };
     const logoutHandler = () => {
@@ -70,7 +71,7 @@ const SideDrawer = () => {
         try {
             setLoading(true);
 
-            const { data } = await axios.get(
+            const { data } = await axios.get<User[]>(
                 `/api/user?search=${search}`,
                 config,
             );
@@ -88,10 +89,10 @@ const SideDrawer = () => {
         }
     };
 
-    const accessChat = async (userId) => {
+    const accessChat = async (userId: string) => {
         try {
             setLoadingChat(true);
-            const { data } = await axios.post(
+            const { data } = await axios.post<Chat>(
                 "/api/chat",
                 {
                     userId,
@@ -99,8 +100,8 @@ const SideDrawer = () => {
                 config,
             );
             setSelectedChat(data);
-            if (!chats.find((x) => x._id === data._id))
-                setChats([data, ...chats]);
+            if (!chats?.find((x) => x._id === data._id))
+                setChats([data, ...(chats ?? [])]);
             setLoadingChat(false);
             onClose();
         } catch (e) {
@@ -149,7 +150,7 @@ const SideDrawer = () => {
                 <div style={{ display: "flex", alignItems: "center" }}>
                     <Menu>
                         <MenuButton p={1}>
-                            {notifications?.length > 0 && (
+                            {notifications && notifications.length > 0 && (
                                 <Badge
                                     position={"absolute"}
                                     colorScheme={"red"}
@@ -160,29 +161,38 @@ const SideDrawer = () => {
                             <Alarm />
                         </MenuButton>
                         <MenuList pl={2}>
-                            {!notifications.length && "no new messages"}
-                            {notifications?.map((notif) => (
-                                <MenuItem
-                                    key={notif._id}
-                                    onClick={() => {
-                                        setSelectedChat(notif.chat);
-                                        setNotifications(
-                                            notifications.filter(
-                                                (n) =>
-                                                    n.chat._id !==
-                                                    notif.chat._id,
-                                            ),
-                                        );
-                                    }}
-                                >
-                                    {notif.chat.isGroupChat
-                                        ? `new message in ${notif.chat.chatName}`
-                                        : `new message from ${
-                                              getSender(user, notif.chat.users)
-                                                  .name
-                                          }: ${notif.content}`}
-                                </MenuItem>
-                            ))}
+                            {notifications &&
+                                !notifications.length &&
+                                "no new messages"}
+                            {user &&
+                                notifications?.map((notif: Message) => (
+                                    <MenuItem
+                                        key={notif._id}
+                                        onClick={() => {
+                                            setSelectedChat(notif.chat as Chat);
+                                            setNotifications(
+                                                notifications.filter(
+                                                    (n: Message) =>
+                                                        (n.chat as Chat)._id !==
+                                                        (notif.chat as Chat)
+                                                            ._id,
+                                                ),
+                                            );
+                                        }}
+                                    >
+                                        {(notif.chat as Chat).isGroupChat
+                                            ? `new message in ${
+                                                  (notif.chat as Chat).chatName
+                                              }`
+                                            : `new message from ${
+                                                  getSender(
+                                                      user,
+                                                      (notif.chat as Chat)
+                                                          .users,
+                                                  ).name
+                                              }: ${notif.content}`}
+                                    </MenuItem>
+                                ))}
                         </MenuList>
                     </Menu>
                     <Menu>
@@ -194,17 +204,21 @@ const SideDrawer = () => {
                             <Avatar
                                 size={"sm"}
                                 cursor={"pointer"}
-                                name={user.name}
-                                src={user.pic}
+                                name={user?.name ?? ""}
+                                src={user?.pic ?? undefined}
                             />
                         </MenuButton>
-                        <MenuList>
-                            <ProfileModal user={user}>
-                                <MenuItem>My Profile</MenuItem>
-                            </ProfileModal>
-                            <MenuDivider />
-                            <MenuItem onClick={logoutHandler}>Logout</MenuItem>
-                        </MenuList>
+                        {user && (
+                            <MenuList>
+                                <ProfileModal user={user}>
+                                    <MenuItem>My Profile</MenuItem>
+                                </ProfileModal>
+                                <MenuDivider />
+                                <MenuItem onClick={logoutHandler}>
+                                    Logout
+                                </MenuItem>
+                            </MenuList>
+                        )}
                     </Menu>
                 </div>
             </Box>
@@ -221,18 +235,24 @@ const SideDrawer = () => {
                                 placeholder="Search by name or email"
                                 mr={2}
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                }}
                             />
-                            <Button onClick={handleSearch}>Go</Button>
+                            <Button onClick={() => void handleSearch()}>
+                                Go
+                            </Button>
                         </Box>
                         {loading ? (
                             <ChatLoading />
                         ) : (
-                            searchResult?.map((user) => (
+                            searchResult.map((user) => (
                                 <UserListItem
                                     key={user._id}
                                     user={user}
-                                    handleFunction={() => accessChat(user._id)}
+                                    handleFunction={() =>
+                                        void accessChat(user._id)
+                                    }
                                 />
                             ))
                         )}

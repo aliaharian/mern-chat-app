@@ -1,30 +1,28 @@
-import axios, { AxiosError } from "axios";
-import { LoginCredentials, SignupCredentials } from "../../types/types";
+import axios from "axios";
+import {
+    LoginCredentials,
+    SignupCredentials,
+    User,
+    ApiError,
+} from "../../types/types";
 
 const login = async (formData: LoginCredentials) => {
     try {
-        const { data } = await axios.post("/api/user/login", formData);
+        const { data } = await axios.post<User>("/api/user/login", formData);
+
         return data;
     } catch (error: unknown) {
-        if (error instanceof AxiosError && error.response) {
-            throw new Error(error.response.data.message);
-        } else {
-            // handle other types of errors or rethrow if needed
-            throw error;
-        }
+        const err: ApiError = error as ApiError;
+        throw new Error(err.response.data.message ?? "");
     }
 };
 const signUp = async (formData: SignupCredentials) => {
     try {
-        const { data } = await axios.post("/api/user", formData);
+        const { data } = await axios.post<User>("/api/user", formData);
         return data;
     } catch (error: unknown) {
-        if (error instanceof AxiosError && error.response) {
-            throw new Error(error.response.data.message);
-        } else {
-            // handle other types of errors or rethrow if needed
-            throw error;
-        }
+        const err: ApiError = error as ApiError;
+        throw new Error(err.response.data.message ?? "");
     }
 };
 

@@ -22,13 +22,21 @@ interface ChatContextType {
 
 export const ChatContext = createContext<ChatContextType>({
     user: undefined,
-    setUser: () => {},
+    setUser: () => {
+        console.log("selecting user");
+    },
     selectedChat: undefined,
-    setSelectedChat: () => {},
+    setSelectedChat: () => {
+        console.log("selecting current chat");
+    },
     chats: undefined,
-    setChats: () => {},
+    setChats: () => {
+        console.log("selecting chats");
+    },
     notifications: undefined,
-    setNotifications: () => {},
+    setNotifications: () => {
+        console.log("selecting notifications");
+    },
 });
 
 const ChatProvider = ({ children }: { children: ReactNode }) => {
@@ -38,12 +46,14 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
     const [notifications, setNotifications] = useState<Message[]>([]);
     const history = useHistory();
 
-    console.log("s", selectedChat);
     useEffect(() => {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const userInfo: User = JSON.parse(
+            localStorage.getItem("userInfo") ?? "{}",
+        ) as User;
+
         setUser(userInfo);
         console.log("called", userInfo);
-        if (!userInfo) {
+        if (!userInfo.token) {
             history.push("/");
         }
     }, [history]);

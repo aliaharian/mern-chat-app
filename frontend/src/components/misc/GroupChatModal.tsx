@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import {
     Box,
     Button,
@@ -20,13 +20,14 @@ import UserListItem from "../userAvatar/UserListItem.js";
 import UserBadgeItem from "../userAvatar/UserBadgeItem.js";
 import PropTypes from "prop-types";
 import { ChatState } from "../../context/chatState.js";
+import { Chat, User } from "../../types/types.js";
 
-const GroupChatModal = ({ children }) => {
+const GroupChatModal = ({ children }: { children?: ReactNode }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [groupChatName, setGroupChatName] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [search, setSearch] = useState("");
-    const [searchResult, setSearchResult] = useState([]);
+    const [searchResult, setSearchResult] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const toast = useToast();
     const { user, chats, setChats, setSelectedChat } = ChatState();
@@ -34,19 +35,19 @@ const GroupChatModal = ({ children }) => {
         () => ({
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
+                Authorization: `Bearer ${user?.token}`,
             },
         }),
-        [user.token],
+        [user?.token],
     );
-    const handleSearch = async (value) => {
+    const handleSearch = async (value: string) => {
         if (!value) {
-            setSearchResult(null);
+            setSearchResult([]);
             return;
         }
         try {
             setLoading(true);
-            const { data } = await axios.get(
+            const { data } = await axios.get<User[]>(
                 `/api/user?search=${value}`,
                 config,
             );
@@ -67,12 +68,16 @@ const GroupChatModal = ({ children }) => {
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            handleSearchCallback(search);
+            handleSearchCallback(search).catch((e: unknown) => {
+                console.log(e);
+            });
         }, 500);
-        return () => clearTimeout(timeout);
+        return () => {
+            clearTimeout(timeout);
+        };
     }, [search, handleSearchCallback]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (): Promise<void> => {
         if (!groupChatName || selectedUsers.length < 1) {
             toast({
                 title: "fill all fields!",
@@ -85,15 +90,17 @@ const GroupChatModal = ({ children }) => {
         }
         try {
             setLoading(true);
-            const { data } = await axios.post(
+            const { data } = await axios.post<Chat>(
                 "/api/chat/group",
                 {
                     name: groupChatName,
-                    users: JSON.stringify(selectedUsers.map((x) => x._id)),
+                    users: JSON.stringify(
+                        selectedUsers.map((x: User) => x._id),
+                    ),
                 },
                 config,
             );
-            setChats([data, ...chats]);
+            setChats([data, ...(chats ?? [])]);
             setSelectedChat(data);
             onClose();
             setLoading(false);
@@ -116,7 +123,7 @@ const GroupChatModal = ({ children }) => {
             setLoading(false);
         }
     };
-    const handleSelectUser = (user) => {
+    const handleSelectUser = (user: User) => {
         if (selectedUsers.includes(user)) {
             toast({
                 title: "user already selected!",
@@ -130,7 +137,7 @@ const GroupChatModal = ({ children }) => {
         setSelectedUsers([...selectedUsers, user]);
     };
 
-    const handleDeleteUser = (user) => {
+    const handleDeleteUser = (user: User) => {
         const tmp = selectedUsers;
         tmp.splice(selectedUsers.indexOf(user), 1);
         setSelectedUsers([...tmp]);
@@ -160,9 +167,9 @@ const GroupChatModal = ({ children }) => {
                             <Input
                                 placeholder={"chat name"}
                                 mb={3}
-                                onChange={(e) =>
-                                    setGroupChatName(e.target.value)
-                                }
+                                onChange={(e) => {
+                                    setGroupChatName(e.target.value);
+                                }}
                             />
                         </FormControl>
                         <FormControl>
@@ -170,7 +177,9 @@ const GroupChatModal = ({ children }) => {
                                 placeholder={"add users"}
                                 mb={1}
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                }}
                             />
                         </FormControl>
                         <Box
@@ -181,9 +190,9 @@ const GroupChatModal = ({ children }) => {
                         >
                             {selectedUsers.map((user) => (
                                 <UserBadgeItem
-                                    handleDeleteUser={() =>
-                                        handleDeleteUser(user)
-                                    }
+                                    handleDeleteUser={() => {
+                                        handleDeleteUser(user);
+                                    }}
                                     user={user}
                                     key={user._id}
                                 />
@@ -192,17 +201,15 @@ const GroupChatModal = ({ children }) => {
                         {loading ? (
                             <Spinner />
                         ) : (
-                            searchResult
-                                ?.slice(0, 4)
-                                .map((user) => (
-                                    <UserListItem
-                                        key={user._id}
-                                        user={user}
-                                        handleFunction={() =>
-                                            handleSelectUser(user)
-                                        }
-                                    />
-                                ))
+                            searchResult.slice(0, 4).map((user) => (
+                                <UserListItem
+                                    key={user._id}
+                                    user={user}
+                                    handleFunction={() => {
+                                        handleSelectUser(user);
+                                    }}
+                                />
+                            ))
                         )}
                     </ModalBody>
 
@@ -211,7 +218,7 @@ const GroupChatModal = ({ children }) => {
                             isLoading={loading}
                             colorScheme="blue"
                             mr={3}
-                            onClick={handleSubmit}
+                            onClick={() => void handleSubmit()}
                         >
                             Create Group
                         </Button>

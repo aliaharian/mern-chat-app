@@ -20,7 +20,7 @@ export interface Message {
     _id: string;
     sender: User;
     content: string;
-    chat: string;
+    chat: string | Chat;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -30,6 +30,14 @@ export interface Chat {
     isGroupChat: boolean;
     latestMessage?: Message;
     updatedAt?: string;
-    users?: User[];
+    users: User[];
     _id: string;
+}
+
+export interface ApiError {
+    response: {
+        data: {
+            message: string | null;
+        };
+    };
 }

@@ -12,12 +12,15 @@ import Login from "../components/authentication/Login.tsx";
 import Signup from "../components/authentication/Signup.tsx";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
+import { User } from "../types/types.ts";
 
 const HomePage = () => {
     const history = useHistory();
     useEffect(() => {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        if (userInfo) {
+        const userInfo: User = JSON.parse(
+            localStorage.getItem("userInfo") ?? "{}",
+        ) as User;
+        if (userInfo.token) {
             history.push("/chats");
         }
     }, [history]);

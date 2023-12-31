@@ -1,7 +1,12 @@
 import { Avatar, Box, Text } from "@chakra-ui/react";
 import PropTypes from "prop-types";
+import { User } from "../../types/types";
 
-const UserListItem = ({ handleFunction, user }) => {
+interface UserListItemProps {
+    user: User;
+    handleFunction: () => void;
+}
+const UserListItem = ({ handleFunction, user }: UserListItemProps) => {
     return (
         <Box
             onClick={handleFunction}
@@ -23,9 +28,9 @@ const UserListItem = ({ handleFunction, user }) => {
             <Avatar
                 mr={2}
                 size={"sm"}
-                cusror={"pointer"}
+                cursor={"pointer"}
                 name={user.name}
-                src={user.pic}
+                src={user.pic ?? undefined}
             />
             <Box>
                 <Text>{user.name}</Text>

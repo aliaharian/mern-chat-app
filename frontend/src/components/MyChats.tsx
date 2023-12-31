@@ -7,9 +7,10 @@ import ChatLoading from "./ChatLoading.tsx";
 import { getSender } from "../config/chatLogics.js";
 import GroupChatModal from "./misc/GroupChatModal.js";
 import PropTypes from "prop-types";
+import { Chat, User } from "../types/types.ts";
 
-const MyChats = ({ fetchAgain }) => {
-    const [loggedUser, setLoggedUser] = useState();
+const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
+    const [loggedUser, setLoggedUser] = useState<User>();
     const { user, selectedChat, setChats, chats, setSelectedChat } =
         ChatState();
     const toast = useToast();
@@ -18,14 +19,14 @@ const MyChats = ({ fetchAgain }) => {
         () => ({
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
+                Authorization: `Bearer ${user?.token}`,
             },
         }),
-        [user.token],
+        [user?.token],
     );
     const fetchChats = async () => {
         try {
-            const { data } = await axios.get("/api/chat", config);
+            const { data } = await axios.get<Chat[]>("/api/chat", config);
             setChats(data);
         } catch (e) {
             console.log(e);
@@ -46,8 +47,17 @@ const MyChats = ({ fetchAgain }) => {
     ]);
 
     useEffect(() => {
-        setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
-        fetchChatsCallback();
+        fetchChatsCallback()
+            .then(() => {
+                setLoggedUser(
+                    JSON.parse(
+                        localStorage.getItem("userInfo") ?? "{}",
+                    ) as User,
+                );
+            })
+            .catch((e: unknown) => {
+                console.log(e);
+            });
     }, [fetchAgain, fetchChatsCallback]);
 
     return (
@@ -96,7 +106,9 @@ const MyChats = ({ fetchAgain }) => {
                     <Stack overflowY={"scroll"}>
                         {chats.map((chat) => (
                             <Box
-                                onClick={() => setSelectedChat(chat)}
+                                onClick={() => {
+                                    setSelectedChat(chat);
+                                }}
                                 cursor={"pointer"}
                                 bg={
                                     selectedChat?._id === chat._id
@@ -114,7 +126,7 @@ const MyChats = ({ fetchAgain }) => {
                                 key={chat._id}
                             >
                                 <Text>
-                                    {!chat.isGroupChat
+                                    {loggedUser && !chat.isGroupChat
                                         ? getSender(loggedUser, chat.users).name
                                         : chat.chatName}
                                 </Text>

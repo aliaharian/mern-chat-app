@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { login, signUp } from "./services";
 import { useToast } from "@chakra-ui/react";
 import { ChatState } from "../../context/chatState";
-import { LoginCredentials, SignupCredentials } from "../../types/types";
+import { LoginCredentials, SignupCredentials, User } from "../../types/types";
 
 const useSignup = () => {
     const toast = useToast();
@@ -19,7 +19,7 @@ const useSignup = () => {
             }
             return signUp(credentials);
         },
-        onSuccess: (data) => {
+        onSuccess: (data: User) => {
             setUser(data);
         },
         onError: (error) => {

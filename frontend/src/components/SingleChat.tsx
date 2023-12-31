@@ -13,15 +13,32 @@ import { ArrowLeft } from "iconsax-react";
 import { getSender } from "../config/chatLogics.js";
 import ProfileModal from "./misc/ProfileModal.js";
 import UpdateGroupChatModal from "./misc/UpdateGroupChatModal.js";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import axios from "axios";
 import "./styles.css";
 import ScrollableChats from "./ScrollableChats.tsx";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
+import { Chat, Message } from "../types/types.ts";
 
-const ENDPOINT = import.meta.env.VITE_SOCKET_URL || "http://localhost:5500";
-let socket, selectedChatCompare, timeout;
-const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+const ENDPOINT: string =
+    (import.meta.env.VITE_SOCKET_URL as string | undefined) ??
+    "http://localhost:5500";
+
+let socket: Socket | undefined,
+    selectedChatCompare: Chat | undefined,
+    timeout: number | undefined;
+interface SingleChatProps {
+    fetchAgain: boolean;
+    setFetchAgain: Dispatch<SetStateAction<boolean>>;
+}
+const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
     const {
         user,
         selectedChat,
@@ -29,9 +46,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         notifications,
         setNotifications,
     } = ChatState();
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
-    const [newMessage, setNewMessage] = useState();
+    const [newMessage, setNewMessage] = useState<string>();
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [socketConnected, setSocketConnected] = useState(false);
@@ -40,10 +57,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         () => ({
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
+                Authorization: `Bearer ${user?.token}`,
             },
         }),
-        [user.token],
+        [user?.token],
     );
 
     useEffect(() => {
@@ -65,13 +82,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         }
         try {
             setLoading(true);
-            const { data } = await axios.get(
+            const { data } = await axios.get<Message[]>(
                 `/api/message?chatId=${selectedChat._id}`,
                 config,
             );
             setMessages(data);
             console.log(data);
-            socket.emit("join chat", selectedChat._id);
+            socket?.emit("join chat", selectedChat._id);
             setLoading(false);
         } catch (e) {
             console.log(e);
@@ -93,18 +110,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     ]);
 
     useEffect(() => {
-        selectedChat && fetchMessagesCallback();
-        selectedChatCompare = selectedChat;
+        selectedChat &&
+            fetchMessagesCallback()
+                .catch((e: unknown) => {
+                    console.log(e);
+                })
+                .finally(() => {
+                    selectedChatCompare = selectedChat;
+                });
     }, [selectedChat, fetchMessagesCallback]);
 
     useEffect(() => {
-        socket.on("message received", (newMessageReceived) => {
+        socket?.on("message received", (newMessageReceived: Message) => {
             if (
                 !selectedChatCompare ||
-                selectedChatCompare._id !== newMessageReceived.chat._id
+                selectedChatCompare._id !==
+                    (newMessageReceived.chat as Chat)._id
             ) {
-                if (!notifications.includes(newMessageReceived)) {
-                    setNotifications([newMessageReceived, ...notifications]);
+                if (!notifications?.includes(newMessageReceived)) {
+                    setNotifications([
+                        newMessageReceived,
+                        ...(notifications ?? []),
+                    ]);
                     setFetchAgain(!fetchAgain);
                 }
             } else {
@@ -113,23 +140,25 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         });
     });
 
-    const sendMessage = async (event) => {
+    const sendMessage = async (
+        event: React.KeyboardEvent<HTMLDivElement>,
+    ): Promise<void> => {
         if (event.key === "Enter" && newMessage) {
             try {
-                socket.emit("stop typing", selectedChat._id);
+                socket?.emit("stop typing", selectedChat?._id);
                 setTyping(false);
-                const { data } = await axios.post(
+                const { data } = await axios.post<Message>(
                     "/api/message",
                     {
                         content: newMessage,
-                        chatId: selectedChat._id,
+                        chatId: selectedChat?._id,
                     },
                     config,
                 );
                 console.log(data);
-                setNewMessage("");
+                setNewMessage(undefined);
                 setMessages([...messages, data]);
-                socket.emit("new message", data);
+                socket?.emit("new message", data);
             } catch (e) {
                 toast({
                     title: "error Occurred!",
@@ -141,14 +170,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
         }
     };
-    const typingHandler = (e) => {
+    const typingHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewMessage(e.target.value);
         if (!socketConnected) {
             return;
         }
         if (!typing) {
             setTyping(true);
-            socket.emit("typing", selectedChat._id);
+            socket?.emit("typing", selectedChat?._id);
         }
         const lastTypingTime = new Date().getTime();
         const timerLength = 3000;
@@ -157,7 +186,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             const timeNow = new Date().getTime();
             const timeDiff = timeNow - lastTypingTime;
             if (timeDiff >= timerLength && typing) {
-                socket.emit("stop typing", selectedChat._id);
+                socket?.emit("stop typing", selectedChat?._id);
                 setTyping(false);
             }
         }, timerLength);
@@ -178,11 +207,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                         alignItems={"center"}
                     >
                         <IconButton
+                            aria-label="arrowLeft"
                             display={{ base: "flex", md: "none" }}
                             icon={<ArrowLeft />}
-                            onClick={() => setSelectedChat(null)}
+                            onClick={() => {
+                                setSelectedChat(undefined);
+                            }}
                         />
-                        {!selectedChat.isGroupChat ? (
+                        {user && !selectedChat.isGroupChat ? (
                             <>
                                 {getSender(user, selectedChat.users).name}
                                 <ProfileModal
@@ -223,7 +255,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                 <ScrollableChats messages={messages} />
                             </div>
                         )}
-                        <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+                        <FormControl
+                            onKeyDown={(e) => {
+                                e.preventDefault(); // Prevent the default behavior of the key press
+                                sendMessage(e).catch((error) => {
+                                    console.error(
+                                        "Error sending message:",
+                                        error,
+                                    );
+                                });
+                            }}
+                            isRequired
+                            mt={3}
+                        >
                             {isTyping ? (
                                 <Text fontSize={"xl"}>is typing...</Text>
                             ) : (

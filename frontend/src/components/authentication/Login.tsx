@@ -17,7 +17,7 @@ const Login = () => {
     const [show, setShow] = useState(false);
     const { mutate, loading } = useLogin();
     const history = useHistory();
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         mutate(
             { email, password },
             {
