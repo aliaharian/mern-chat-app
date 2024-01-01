@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChatState } from "../context/chatState.js";
+import { ChatState } from "../context/chatState";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { Add } from "iconsax-react";
 import ChatLoading from "./ChatLoading.tsx";
-import { getSender } from "../config/chatLogics.js";
-import GroupChatModal from "./misc/GroupChatModal.js";
+import { getSender } from "../config/chatLogics";
+import GroupChatModal from "./misc/GroupChatModal";
 import PropTypes from "prop-types";
 import { Chat, User } from "../types/types.ts";
 

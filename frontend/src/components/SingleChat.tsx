@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { ChatState } from "../context/chatState.js";
+import { ChatState } from "../context/chatState";
 import {
     Box,
     FormControl,
@@ -10,9 +10,9 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import { ArrowLeft } from "iconsax-react";
-import { getSender } from "../config/chatLogics.js";
-import ProfileModal from "./misc/ProfileModal.js";
-import UpdateGroupChatModal from "./misc/UpdateGroupChatModal.js";
+import { getSender } from "../config/chatLogics";
+import ProfileModal from "./misc/ProfileModal";
+import UpdateGroupChatModal from "./misc/UpdateGroupChatModal";
 import React, {
     Dispatch,
     SetStateAction,
@@ -33,7 +33,7 @@ const ENDPOINT: string =
 
 let socket: Socket | undefined,
     selectedChatCompare: Chat | undefined,
-    timeout: number | undefined;
+    timeout: ReturnType<typeof setTimeout> | undefined;
 interface SingleChatProps {
     fetchAgain: boolean;
     setFetchAgain: Dispatch<SetStateAction<boolean>>;
