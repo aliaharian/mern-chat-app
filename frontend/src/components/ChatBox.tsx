@@ -1,6 +1,6 @@
-import { ChatState } from "../context/chatState.js";
+import { ChatState } from "../context/chatState.ts";
 import { Box } from "@chakra-ui/react";
-import SingleChat from "./SingleChat.js";
+import SingleChat from "./SingleChat.tsx";
 import { Dispatch, SetStateAction } from "react";
 
 interface ChatboxProps {

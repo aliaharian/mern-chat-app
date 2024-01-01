@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-vi.mock("axios"); // Mock axios to isolate component behavior
+jest.mock("axios");
 
 describe("App component", () => {
     it("redirects to login page if token not set", () => {

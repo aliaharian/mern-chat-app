@@ -1,4 +1,4 @@
-/// <reference types="vitest" />
+/// <reference types="jest" />
 /// <reference types="vite/client" />
 
 import { defineConfig } from "vite";
@@ -15,11 +15,5 @@ export default defineConfig({
                 secure: false,
             },
         },
-    },
-    test: {
-        globals: true,
-        environment: "jsdom",
-        css: true,
-        setupFiles: "./src/test/setup.ts",
     },
 });

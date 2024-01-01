@@ -22,13 +22,13 @@ import {
 } from "@chakra-ui/react";
 import { Alarm, ArrowDown2, SearchNormal } from "iconsax-react";
 import { useState } from "react";
-import { ChatState } from "../../context/chatState.js";
+import { ChatState } from "../../context/chatState";
 import ProfileModal from "./ProfileModal.tsx";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import ChatLoading from "../ChatLoading.tsx";
-import UserListItem from "../userAvatar/UserListItem.js";
-import { getSender } from "../../config/chatLogics.js";
+import UserListItem from "../userAvatar/UserListItem";
+import { getSender } from "../../config/chatLogics";
 import { Chat, Message, User } from "../../types/types.ts";
 
 const SideDrawer = () => {
