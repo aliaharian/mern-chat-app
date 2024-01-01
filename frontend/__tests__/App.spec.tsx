@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import App from "./App";
+import App from "../src/App";
 import axios from "axios";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

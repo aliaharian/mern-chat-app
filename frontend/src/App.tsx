@@ -1,9 +1,9 @@
 import "./App.css";
 import { Route } from "react-router-dom";
-import HomePage from "./pages/HomePage.js";
-import ChatPage from "./pages/ChatPage.js";
+import HomePage from "./pages/HomePage";
+import ChatPage from "./pages/ChatPage";
 import axios from "axios";
-import { User } from "./types/types.js";
+import { User } from "./types/types";
 
 function App() {
     const userInfo: User = JSON.parse(

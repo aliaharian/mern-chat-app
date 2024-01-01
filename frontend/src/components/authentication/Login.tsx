@@ -34,6 +34,7 @@ const Login = () => {
                 <FormLabel>Email</FormLabel>
                 <Input
                     placeholder={"enter your email"}
+                    aria-label="email-input"
                     onChange={(e) => {
                         setEmail(e.target.value);
                     }}
@@ -44,6 +45,7 @@ const Login = () => {
                 <FormLabel>Password</FormLabel>
                 <InputGroup>
                     <Input
+                        aria-label="password-input"
                         type={show ? "text" : "password"}
                         placeholder={"enter your password"}
                         onChange={(e) => {
@@ -67,6 +69,7 @@ const Login = () => {
                 mt={4}
                 colorScheme={"blue"}
                 isLoading={loading}
+                aria-label="submit-login-btn"
                 onClick={handleSubmit}
             >
                 Login

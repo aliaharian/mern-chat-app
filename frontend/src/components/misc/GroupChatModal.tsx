@@ -16,11 +16,11 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import UserListItem from "../userAvatar/UserListItem.js";
-import UserBadgeItem from "../userAvatar/UserBadgeItem.js";
+import UserListItem from "../userAvatar/UserListItem";
+import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import PropTypes from "prop-types";
-import { ChatState } from "../../context/chatState.js";
-import { Chat, User } from "../../types/types.js";
+import { ChatState } from "../../context/chatState";
+import { Chat, User } from "../../types/types";
 
 const GroupChatModal = ({ children }: { children?: ReactNode }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
