@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">25.28% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/87</span>
+                <span class='fraction'>22/87</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">25.28% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/87</span>
+                <span class='fraction'>22/87</span>
             </div>
         
             
@@ -150,7 +150,14 @@
 <a name='L85'></a><a href='#L85'>85</a>
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L88'></a><a href='#L88'>88</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -216,35 +223,28 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import ScrollableFeed from "react-scrollable-feed";</span></span></span>
-<span class="cstat-no" title="statement not covered" >import { Avatar, Box, Tooltip } from "@chakra-ui/react";</span>
-<span class="cstat-no" title="statement not covered" >import { isLastMessage, isSameSender } from "../config/chatLogics.js";</span>
-<span class="cstat-no" title="statement not covered" >import { ChatState } from "../context/chatState.js";</span>
-<span class="cstat-no" title="statement not covered" >import PropTypes from "prop-types";</span>
-<span class="cstat-no" title="statement not covered" >import { Message } from "../types/types.js";</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >const ScrollableChats = ({ messages }: { messages?: Message[] }) =&gt; {</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import ScrollableFeed from "react-scrollable-feed";
+import { Avatar, Box, Tooltip } from "@chakra-ui/react";
+import { isLastMessage, isSameSender } from "../config/chatLogics.js";
+import { ChatState } from "../context/chatState.js";
+import PropTypes from "prop-types";
+import { Message } from "../types/types.js";
+&nbsp;
+const ScrollableChats = <span class="fstat-no" title="function not covered" >({ messages }: { messages?: Message[] }) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    const { user } = ChatState();</span>
 <span class="cstat-no" title="statement not covered" >    return (</span>
 <span class="cstat-no" title="statement not covered" >        &lt;ScrollableFeed&gt;</span>
@@ -310,20 +310,20 @@
 <span class="cstat-no" title="statement not covered" >        &lt;/ScrollableFeed&gt;</span>
 <span class="cstat-no" title="statement not covered" >    );</span>
 <span class="cstat-no" title="statement not covered" >};</span>
-<span class="cstat-no" title="statement not covered" >ScrollableChats.propTypes = {</span>
-<span class="cstat-no" title="statement not covered" >    messages: PropTypes.arrayOf(</span>
-<span class="cstat-no" title="statement not covered" >        PropTypes.shape({</span>
-<span class="cstat-no" title="statement not covered" >            content: PropTypes.string.isRequired,</span>
-<span class="cstat-no" title="statement not covered" >            _id: PropTypes.string.isRequired,</span>
-<span class="cstat-no" title="statement not covered" >            sender: PropTypes.shape({</span>
-<span class="cstat-no" title="statement not covered" >                _id: PropTypes.string.isRequired,</span>
-<span class="cstat-no" title="statement not covered" >                name: PropTypes.string.isRequired,</span>
-<span class="cstat-no" title="statement not covered" >                pic: PropTypes.string,</span>
-<span class="cstat-no" title="statement not covered" >            }),</span>
-<span class="cstat-no" title="statement not covered" >        }),</span>
-<span class="cstat-no" title="statement not covered" >    ).isRequired,</span>
-<span class="cstat-no" title="statement not covered" >};</span>
-<span class="cstat-no" title="statement not covered" >export default ScrollableChats;</span>
+ScrollableChats.propTypes = {
+    messages: PropTypes.arrayOf(
+        PropTypes.shape({
+            content: PropTypes.string.isRequired,
+            _id: PropTypes.string.isRequired,
+            sender: PropTypes.shape({
+                _id: PropTypes.string.isRequired,
+                name: PropTypes.string.isRequired,
+                pic: PropTypes.string,
+            }),
+        }),
+    ).isRequired,
+};
+export default ScrollableChats;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -331,7 +331,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-31T13:46:42.230Z
+                at 2023-12-31T14:24:19.202Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

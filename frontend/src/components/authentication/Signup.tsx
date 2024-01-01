@@ -183,6 +183,7 @@ const Signup = () => {
                 mt={4}
                 colorScheme={"blue"}
                 onClick={handleSubmit}
+                aria-label="signup-submit-form"
             >
                 Signup
             </Button>

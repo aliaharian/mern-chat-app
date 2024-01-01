@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>33/33</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>33/33</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,87 +96,72 @@
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { useState } from "react";</span></span></span>
-<span class="cstat-no" title="statement not covered" >import { ChatState } from "../context/chatState.ts";</span>
-<span class="cstat-no" title="statement not covered" >import { Box } from "@chakra-ui/react";</span>
-<span class="cstat-no" title="statement not covered" >import SideDrawer from "../components/misc/SideDrawer.tsx";</span>
-<span class="cstat-no" title="statement not covered" >import MyChats from "../components/MyChats.tsx";</span>
-<span class="cstat-no" title="statement not covered" >import ChatBox from "../components/ChatBox.tsx";</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >const ChatPage = () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    const { user } = ChatState();</span>
-<span class="cstat-no" title="statement not covered" >    const [fetchAgain, setFetchAgain] = useState(false);</span>
-<span class="cstat-no" title="statement not covered" >    return (</span>
-<span class="cstat-no" title="statement not covered" >        &lt;div style={{ width: "100%" }}&gt;</span>
-<span class="cstat-no" title="statement not covered" >            {user &amp;&amp; &lt;SideDrawer /&gt;}</span>
-<span class="cstat-no" title="statement not covered" >            &lt;Box</span>
-<span class="cstat-no" title="statement not covered" >                display={"flex"}</span>
-<span class="cstat-no" title="statement not covered" >                justifyContent={"space-between"}</span>
-<span class="cstat-no" title="statement not covered" >                w={"100%"}</span>
-<span class="cstat-no" title="statement not covered" >                h={"91.5vh"}</span>
-<span class="cstat-no" title="statement not covered" >                p={"10px"}</span>
-<span class="cstat-no" title="statement not covered" >            &gt;</span>
-<span class="cstat-no" title="statement not covered" >                {user &amp;&amp; (</span>
-<span class="cstat-no" title="statement not covered" >                    &lt;MyChats</span>
-<span class="cstat-no" title="statement not covered" >                        fetchAgain={fetchAgain}</span>
-<span class="cstat-no" title="statement not covered" >                        setFetchAgain={setFetchAgain}</span>
-<span class="cstat-no" title="statement not covered" >                    /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                )}</span>
-<span class="cstat-no" title="statement not covered" >                {user &amp;&amp; (</span>
-<span class="cstat-no" title="statement not covered" >                    &lt;ChatBox</span>
-<span class="cstat-no" title="statement not covered" >                        fetchAgain={fetchAgain}</span>
-<span class="cstat-no" title="statement not covered" >                        setFetchAgain={setFetchAgain}</span>
-<span class="cstat-no" title="statement not covered" >                    /&gt;</span>
-<span class="cstat-no" title="statement not covered" >                )}</span>
-<span class="cstat-no" title="statement not covered" >            &lt;/Box&gt;</span>
-<span class="cstat-no" title="statement not covered" >        &lt;/div&gt;</span>
-<span class="cstat-no" title="statement not covered" >    );</span>
-<span class="cstat-no" title="statement not covered" >};</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >export default ChatPage;</span>
+<a name='L34'></a><a href='#L34'>34</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useState } from "react";
+import { ChatState } from "../context/chatState.ts";
+import { Box } from "@chakra-ui/react";
+import SideDrawer from "../components/misc/SideDrawer.tsx";
+import MyChats from "../components/MyChats.tsx";
+import ChatBox from "../components/ChatBox.tsx";
+&nbsp;
+const ChatPage = () =&gt; {
+    const { user } = ChatState();
+    const [fetchAgain, setFetchAgain] = useState&lt;boolean&gt;(false);
+    return (
+        &lt;div style={{ width: "100%" }}&gt;
+            {<span class="branch-0 cbranch-no" title="branch not covered" >user ? &lt;SideDrawer /&gt; : "Echo Talk!"}</span>
+            &lt;Box
+                display={"flex"}
+                justifyContent={"space-between"}
+                w={"100%"}
+                h={"91.5vh"}
+                p={"10px"}
+            &gt;
+                {user &amp;&amp; &lt;MyChats fetchAgain={fetchAgain} /&gt;}
+                {user &amp;&amp; (
+                    &lt;ChatBox
+                        fetchAgain={fetchAgain}
+                        setFetchAgain={setFetchAgain}
+                    /&gt;
+                )}
+            &lt;/Box&gt;
+        &lt;/div&gt;
+    );
+};
+&nbsp;
+export default ChatPage;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -184,7 +169,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-31T13:46:42.230Z
+                at 2023-12-31T14:24:19.202Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

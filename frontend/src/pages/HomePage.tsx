@@ -42,7 +42,7 @@ const HomePage = () => {
                     fontFamily={"Work Sans"}
                     textAlign={"center"}
                 >
-                    chat app
+                    Echo Talk!
                 </Text>
             </Box>
             <Box
@@ -54,8 +54,12 @@ const HomePage = () => {
             >
                 <Tabs variant={"soft-rounded"} w={"100%"}>
                     <TabList mb={1}>
-                        <Tab w={"50%"}>Login</Tab>
-                        <Tab w={"50%"}>Signup</Tab>
+                        <Tab w={"50%"} aria-label="login-btn">
+                            Login
+                        </Tab>
+                        <Tab w={"50%"} aria-label="signup-btn">
+                            Signup
+                        </Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>

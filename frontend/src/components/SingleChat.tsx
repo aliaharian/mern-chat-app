@@ -33,7 +33,7 @@ const ENDPOINT: string =
 
 let socket: Socket | undefined,
     selectedChatCompare: Chat | undefined,
-    timeout: number | undefined;
+    timeout: ReturnType<typeof setTimeout> | undefined;
 interface SingleChatProps {
     fetchAgain: boolean;
     setFetchAgain: Dispatch<SetStateAction<boolean>>;
