@@ -54,6 +54,7 @@ const useLogin = () => {
             setUser(data);
         },
         onError: (error) => {
+            console.log("error", error);
             toast({
                 title: error.message,
                 status: "error",

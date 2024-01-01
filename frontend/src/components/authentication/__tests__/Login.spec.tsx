@@ -1,8 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Login from "../Login";
+import axiosMock from "../../../__mocks__/axios";
 
 const queryClient = new QueryClient();
+
 const MockedLogin = () => (
     <QueryClientProvider client={queryClient}>
         <Login />
@@ -42,14 +44,68 @@ describe("Login component view", () => {
     });
 });
 
-describe.only("Login component functionality", () => {
-    test("calls handleSubmit function on button click", async () => {
+describe("Login component functionality", () => {
+    beforeEach(() => {
+        axiosMock.reset();
+    });
+    test("validate when inputs are empty", async () => {
         const { getByLabelText } = render(<MockedLogin />);
+        const consoleSpy = vi.spyOn(console, "log");
         const loginButton = getByLabelText("submit-login-btn");
         fireEvent.click(loginButton);
         await waitFor(() => {
-            const toast = screen.queryByText(/fill all/i);
-            expect(toast).toBeInTheDocument();
+            // Check if console.log was called with the expected error message
+            expect(consoleSpy).toHaveBeenCalledWith("error", expect.anything());
+            // Restore the original console.log implementation
+            consoleSpy.mockRestore();
+        });
+    });
+    test("validate when user or pass is wrong", async () => {
+        const { getByLabelText } = render(<MockedLogin />);
+        const consoleSpy = vi.spyOn(console, "log");
+        const passwordInput = getByLabelText(
+            "password-input",
+        ) as HTMLFormElement;
+        const emailInput = getByLabelText("email-input") as HTMLFormElement;
+        fireEvent.change(emailInput, { target: { value: "email@wrong.com" } });
+        fireEvent.change(passwordInput, { target: { value: "wrongPassword" } });
+        const loginButton = getByLabelText("submit-login-btn");
+        fireEvent.click(loginButton);
+        await waitFor(() => {
+            expect(consoleSpy).toHaveBeenCalledWith("error", expect.anything());
+        });
+    });
+    test("login successfuly when user pass is correct", async () => {
+        const { getByLabelText } = render(<MockedLogin />);
+        const mockedUserCredentials = {
+            email: "email@correct.com",
+            password: "correctPassword",
+        };
+        axiosMock.onPost("/api/user/login").reply(200, {
+            _id: "correctUserId",
+            email: "email@correct.com",
+            token: "reallyCorrectToken",
+        });
+        const passwordInput = getByLabelText(
+            "password-input",
+        ) as HTMLFormElement;
+        const emailInput = getByLabelText("email-input") as HTMLFormElement;
+        fireEvent.change(emailInput, {
+            target: { value: mockedUserCredentials.email },
+        });
+        fireEvent.change(passwordInput, {
+            target: { value: mockedUserCredentials.password },
+        });
+        const loginButton = getByLabelText("submit-login-btn");
+        fireEvent.click(loginButton);
+        await waitFor(() => {
+            expect(localStorage.getItem("userInfo")).toEqual(
+                JSON.stringify({
+                    _id: "correctUserId",
+                    email: mockedUserCredentials.email,
+                    token: "reallyCorrectToken",
+                }),
+            );
         });
     });
 });
