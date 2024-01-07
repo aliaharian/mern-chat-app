@@ -65,6 +65,7 @@ const SideDrawer = () => {
         }
         searchUserMutation(search, {
             onSuccess: (data) => {
+                console.log("ressssdsdsdsds", data);
                 setSearchResult(data);
             },
             onError: () => {

@@ -16,7 +16,7 @@ const fetchMessages = asyncHandler(async (req, res) => {
             throw new Error("not found");
         }
         const messages = await Message.find({ chat: chatId })
-            .populate("sender", "name pic")
+            .populate("sender", "name email pic")
             .populate("chat");
         // .sort({ updatedAt: -1 });
 
