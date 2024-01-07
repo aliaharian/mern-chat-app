@@ -27,3 +27,7 @@ type Query {
     chats: [Chat]
     messages(chatId: ID!): [Message]
 }
+
+type Subscription {
+    test(id: ID!): ID
+}

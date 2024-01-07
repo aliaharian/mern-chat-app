@@ -1,4 +1,3 @@
-const { ApolloServer } = require("apollo-server-express");
 const fs = require("fs");
 const path = require("path");
 const { allUsers } = require("../controllers/userController");
@@ -55,23 +54,4 @@ const resolvers = {
     },
 };
 
-const apServer = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: ({ req, res }) => {
-        req.gql = true;
-        return {
-            req,
-            res,
-            next: () => {},
-        };
-    },
-});
-const initGraphql = (app) => {
-    apServer.start().then(() => {
-        apServer.applyMiddleware({ app });
-        console.log("graphql started!".blue.underline.bold);
-    });
-};
-
-module.exports = { initGraphql, apServer };
+module.exports = { typeDefs, resolvers };
