@@ -15,13 +15,12 @@ const fetchMessages = asyncHandler(async (req, res) => {
             res.status(404);
             throw new Error("not found");
         }
-        const messages = await Message.find({ chat: chatId }).populate(
-            "sender",
-            "name pic",
-        );
+        const messages = await Message.find({ chat: chatId })
+            .populate("sender", "name pic")
+            .populate("chat");
         // .sort({ updatedAt: -1 });
 
-        res.send(messages);
+        return req.gql ? messages : res.send(messages);
     } catch (e) {
         throw new Error(e);
     }

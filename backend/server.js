@@ -4,13 +4,18 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
-const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
+const { errorHandler } = require("./middlewares/errorMiddleware");
 const path = require("path");
+const { initGraphql, apServer } = require("./graphql/index");
+
 require("colors");
+
+// app.use(graphql);
 
 dotenv.config();
 connectDB();
 const app = express();
+initGraphql(app);
 app.use(express.json());
 
 const __dirname1 = path.resolve();
@@ -33,12 +38,15 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-app.use(notFound);
+// app.use(notFound);
 app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
 
-const server = app.listen(port, console.log(`live on ${port}`.yellow.bold));
+const server = app.listen(port, () => {
+    console.log(`live on ${port}`.yellow.bold);
+    console.log(`graphql path is ${apServer.graphqlPath}`);
+});
 
 const io = require("socket.io")(server, {
     pingTimeout: 60000,
