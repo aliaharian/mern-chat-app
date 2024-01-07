@@ -26,4 +26,13 @@ const signUp = async (formData: SignupCredentials) => {
     }
 };
 
-export { login, signUp };
+const searchUser = async (search: string) => {
+    try {
+        const { data } = await axios.get<User[]>(`/api/user?search=${search}`);
+        return data;
+    } catch (error: unknown) {
+        const err: ApiError = error as ApiError;
+        throw new Error(err.response.data.message ?? "");
+    }
+};
+export { login, signUp, searchUser };

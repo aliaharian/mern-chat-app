@@ -25,39 +25,34 @@ import { useState } from "react";
 import { ChatState } from "../../context/chatState";
 import ProfileModal from "./ProfileModal.tsx";
 import { useHistory } from "react-router-dom";
-import axios from "axios";
 import ChatLoading from "../ChatLoading.tsx";
 import UserListItem from "../userAvatar/UserListItem";
 import { getSender } from "../../config/chatLogics";
 import { Chat, Message, User } from "../../types/types";
+import { useAccessChat } from "../../query/chat/hooks.ts";
+import { useSearchUser } from "../../query/user/hooks.ts";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SideDrawer = () => {
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState<User[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [loadingChat, setLoadingChat] = useState<boolean>(false);
-    const {
-        user,
-        setSelectedChat,
-        chats,
-        setChats,
-        notifications,
-        setNotifications,
-    } = ChatState();
+    const { mutate: accessChatMutation, loading: loadingChat } =
+        useAccessChat();
+    const { mutate: searchUserMutation, loading: loading } = useSearchUser();
+    const { user, setSelectedChat, notifications, setNotifications } =
+        ChatState();
+    const queryClient = useQueryClient();
+    const chats: Chat[] = queryClient.getQueryData(["chats"]) ?? [];
+    console.log("chaaaa", chats);
     const history = useHistory();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
-    const config = {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user?.token}`,
-        },
-    };
+
     const logoutHandler = () => {
         localStorage.removeItem("userInfo");
         history.push("/");
     };
-    const handleSearch = async () => {
+    const handleSearch = () => {
         if (!search) {
             toast({
                 title: "please enter something in search",
@@ -68,52 +63,40 @@ const SideDrawer = () => {
             });
             return;
         }
-        try {
-            setLoading(true);
-
-            const { data } = await axios.get<User[]>(
-                `/api/user?search=${search}`,
-                config,
-            );
-            setSearchResult(data);
-            setLoading(false);
-        } catch (e) {
-            toast({
-                title: "error Occurred!",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "top-left",
-            });
-            setLoading(false);
-        }
+        searchUserMutation(search, {
+            onSuccess: (data) => {
+                setSearchResult(data);
+            },
+            onError: () => {
+                toast({
+                    title: "error Occurred!",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-left",
+                });
+            },
+        });
     };
 
-    const accessChat = async (userId: string) => {
-        try {
-            setLoadingChat(true);
-            const { data } = await axios.post<Chat>(
-                "/api/chat",
-                {
-                    userId,
-                },
-                config,
-            );
-            setSelectedChat(data);
-            if (!chats?.find((x) => x._id === data._id))
-                setChats([data, ...(chats ?? [])]);
-            setLoadingChat(false);
-            onClose();
-        } catch (e) {
-            toast({
-                title: "error Occurred!",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "top-left",
-            });
-            setLoadingChat(false);
-        }
+    const accessChat = (userId: string) => {
+        accessChatMutation(userId, {
+            onSuccess: (data) => {
+                setSelectedChat(data);
+                if (!chats.find((x) => x._id === data._id))
+                    queryClient.setQueryData(["chats"], [data, ...chats]);
+                onClose();
+            },
+            onError: () => {
+                toast({
+                    title: "error Occurred!",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-left",
+                });
+            },
+        });
     };
     return (
         <>
@@ -239,7 +222,11 @@ const SideDrawer = () => {
                                     setSearch(e.target.value);
                                 }}
                             />
-                            <Button onClick={() => void handleSearch()}>
+                            <Button
+                                onClick={() => {
+                                    handleSearch();
+                                }}
+                            >
                                 Go
                             </Button>
                         </Box>
@@ -250,9 +237,9 @@ const SideDrawer = () => {
                                 <UserListItem
                                     key={user._id}
                                     user={user}
-                                    handleFunction={() =>
-                                        void accessChat(user._id)
-                                    }
+                                    handleFunction={() => {
+                                        accessChat(user._id);
+                                    }}
                                 />
                             ))
                         )}
