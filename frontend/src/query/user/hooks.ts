@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { login, signUp } from "./services";
+import { login, searchUser, signUp } from "./services";
 import { useToast } from "@chakra-ui/react";
 import { ChatState } from "../../context/chatState";
 import { LoginCredentials, SignupCredentials, User } from "../../types/types";
@@ -70,4 +70,17 @@ const useLogin = () => {
     };
 };
 
-export { useSignup, useLogin };
+const useSearchUser = () => {
+    const { mutate, isPending } = useMutation({
+        mutationKey: ["searchUser"],
+        mutationFn: (search: string) => {
+            return searchUser(search);
+        },
+    });
+    return {
+        mutate,
+        loading: isPending,
+    };
+};
+
+export { useSignup, useLogin, useSearchUser };

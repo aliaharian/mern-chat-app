@@ -13,19 +13,13 @@ import { ArrowLeft } from "iconsax-react";
 import { getSender } from "../config/chatLogics";
 import ProfileModal from "./misc/ProfileModal";
 import UpdateGroupChatModal from "./misc/UpdateGroupChatModal";
-import React, {
-    Dispatch,
-    SetStateAction,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
-import axios from "axios";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import "./styles.css";
 import ScrollableChats from "./ScrollableChats.tsx";
 import io, { Socket } from "socket.io-client";
 import { Chat, Message } from "../types/types.ts";
+import { useFetchMessages, useSendMessage } from "../query/message/hooks.ts";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ENDPOINT: string =
     (import.meta.env.VITE_SOCKET_URL as string | undefined) ??
@@ -46,23 +40,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
         notifications,
         setNotifications,
     } = ChatState();
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
+    // const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState<string>();
     const [typing, setTyping] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [socketConnected, setSocketConnected] = useState(false);
+    const { data: messages, loading } = useFetchMessages(selectedChat);
     const toast = useToast();
-    const config = useMemo(
-        () => ({
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user?.token}`,
-            },
-        }),
-        [user?.token],
-    );
-
+    const { mutate: sendMessageMutation } = useSendMessage();
     useEffect(() => {
         socket = io(ENDPOINT);
         socket.emit("setup", user);
@@ -76,49 +62,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
             setIsTyping(false);
         });
     }, [user]);
-    const fetchMessages = async () => {
-        if (!selectedChat) {
-            return;
-        }
-        try {
-            setLoading(true);
-            const { data } = await axios.get<Message[]>(
-                `/api/message?chatId=${selectedChat._id}`,
-                config,
-            );
-            setMessages(data);
-            console.log(data);
-            socket?.emit("join chat", selectedChat._id);
-            setLoading(false);
-        } catch (e) {
-            console.log(e);
-            setLoading(false);
-            toast({
-                title: "error Occurred!",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "top-left",
-            });
-        }
-    };
-
-    const fetchMessagesCallback = useCallback(fetchMessages, [
-        config,
-        selectedChat,
-        toast,
-    ]);
 
     useEffect(() => {
-        selectedChat &&
-            fetchMessagesCallback()
-                .catch((e: unknown) => {
-                    console.log(e);
-                })
-                .finally(() => {
-                    selectedChatCompare = selectedChat;
-                });
-    }, [selectedChat, fetchMessagesCallback]);
+        if (selectedChat) selectedChatCompare = selectedChat;
+    }, [selectedChat]);
 
     useEffect(() => {
         socket?.on("message received", (newMessageReceived: Message) => {
@@ -132,33 +79,40 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
                         newMessageReceived,
                         ...(notifications ?? []),
                     ]);
-                    setFetchAgain(!fetchAgain);
+                    queryClient
+                        .invalidateQueries({ queryKey: ["chats"] })
+                        .catch((e) => {
+                            console.log(e);
+                        });
                 }
             } else {
-                setMessages([...messages, newMessageReceived]);
+                queryClient.setQueryData(
+                    ["messages", { id: selectedChat?._id }],
+                    [...(messages ?? []), newMessageReceived],
+                );
             }
         });
     });
 
-    const sendMessage = async (
-        event: React.KeyboardEvent<HTMLDivElement>,
-    ): Promise<void> => {
+    const sendMessage = (event: React.KeyboardEvent<HTMLDivElement>): void => {
         if (event.key === "Enter" && newMessage) {
             try {
                 socket?.emit("stop typing", selectedChat?._id);
                 setTyping(false);
-                const { data } = await axios.post<Message>(
-                    "/api/message",
+                sendMessageMutation(
+                    { message: newMessage, selectedChat },
                     {
-                        content: newMessage,
-                        chatId: selectedChat?._id,
+                        onSuccess: (data?: Message) => {
+                            console.log(data);
+                            setNewMessage("");
+                            queryClient.setQueryData(
+                                ["messages", { id: selectedChat?._id }],
+                                [...(messages ?? []), data],
+                            );
+                            socket?.emit("new message", data);
+                        },
                     },
-                    config,
                 );
-                console.log(data);
-                setNewMessage(undefined);
-                setMessages([...messages, data]);
-                socket?.emit("new message", data);
             } catch (e) {
                 toast({
                     title: "error Occurred!",
@@ -171,6 +125,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
         }
     };
     const typingHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(newMessage);
         setNewMessage(e.target.value);
         if (!socketConnected) {
             return;
@@ -257,13 +212,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: SingleChatProps) => {
                         )}
                         <FormControl
                             onKeyDown={(e) => {
-                                e.preventDefault(); // Prevent the default behavior of the key press
-                                sendMessage(e).catch((error) => {
-                                    console.error(
-                                        "Error sending message:",
-                                        error,
-                                    );
-                                });
+                                sendMessage(e);
                             }}
                             isRequired
                             mt={3}

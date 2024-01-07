@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Box,
     Button,
@@ -19,23 +19,30 @@ import {
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import UserListItem from "../userAvatar/UserListItem";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import PropTypes from "prop-types";
 import { ChatState } from "../../context/chatState";
 import { Eye } from "iconsax-react";
 import { Chat, User } from "../../types/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSearchUser } from "../../query/user/hooks";
+import {
+    useAddUserToGroup,
+    useRemoveUserFromGroup,
+    useRenameGroup,
+} from "../../query/chat/hooks";
 
 const UpdateGroupChatModal = () =>
     // { fetchAgain, setFetchAgain }
     {
-        const { user, chats, setChats, selectedChat, setSelectedChat } =
-            ChatState();
+        const { user, selectedChat, setSelectedChat } = ChatState();
         const { isOpen, onOpen, onClose } = useDisclosure();
         const [groupChatName, setGroupChatName] = useState<string>(
             selectedChat?.chatName ?? "",
         );
+        const queryClient = useQueryClient();
+        const chats: Chat[] = queryClient.getQueryData(["chats"]) ?? [];
         const [selectedUsers, setSelectedUsers] = useState<User[]>(
             selectedChat
                 ? [
@@ -48,94 +55,94 @@ const UpdateGroupChatModal = () =>
         const [search, setSearch] = useState("");
         const [searchResult, setSearchResult] = useState<User[]>([]);
         const [loading, setLoading] = useState(false);
+        const { mutate: searchUserMutation } = useSearchUser();
+        const { mutate: renameGroupMutation } = useRenameGroup();
+        const { mutate: addUserMutation } = useAddUserToGroup();
+        const { mutate: removeUserMutation } = useRemoveUserFromGroup();
         const toast = useToast();
-        const config = useMemo(
-            () => ({
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${user?.token}`,
-                },
-            }),
-            [user?.token],
-        );
-        const handleSearch = async (value: string) => {
+
+        const handleSearch = (value: string) => {
             if (!value) {
                 setSearchResult([]);
                 return;
             }
-            try {
-                setLoading(true);
-                const { data } = await axios.get<User[]>(
-                    `/api/user?search=${value}`,
-                    config,
-                );
-                setLoading(false);
-                setSearchResult(data);
-            } catch (e) {
-                console.log(e);
-                toast({
-                    title: "error Occurred!",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-            }
+            setLoading(true);
+            searchUserMutation(value, {
+                onSuccess: (data) => {
+                    setSearchResult(data);
+                },
+                onError: () => {
+                    toast({
+                        title: "error Occurred!",
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "top-left",
+                    });
+                },
+                onSettled: () => {
+                    setLoading(false);
+                },
+            });
         };
-        const handleSearchCallback = useCallback(handleSearch, [config, toast]);
+        const handleSearchCallback = useCallback(handleSearch, [
+            searchUserMutation,
+            toast,
+        ]);
 
         useEffect(() => {
             const timeout = setTimeout(() => {
-                handleSearchCallback(search).catch((e: unknown) => {
-                    console.log(e);
-                });
+                handleSearchCallback(search);
             }, 500);
             return () => {
                 clearTimeout(timeout);
             };
         }, [search, handleSearchCallback]);
 
-        const handleLeaveGroup = async () => {
-            try {
-                setLoading(true);
-                await axios.put(
-                    "/api/chat/group/removeMember",
+        const handleLeaveGroup = () => {
+            setLoading(true);
+            user &&
+                selectedChat &&
+                removeUserMutation(
                     {
-                        chatId: selectedChat?._id,
-                        userId: user?._id,
+                        chatId: selectedChat._id,
+                        userId: user._id,
                     },
-                    config,
+                    {
+                        onSuccess: () => {
+                            const tmp = [...chats];
+                            const chatIndex = tmp.findIndex(
+                                (t) => t._id === selectedChat._id,
+                            );
+                            tmp.splice(chatIndex, 1);
+                            console.log(tmp);
+                            queryClient.setQueryData(["chats"], [...tmp]);
+                            setSelectedChat(undefined);
+                            onClose();
+                            toast({
+                                title: "You left group successfully!",
+                                status: "success",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onError: () => {
+                            toast({
+                                title: "error Occurred!",
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onSettled: () => {
+                            setLoading(false);
+                        },
+                    },
                 );
-                const tmp = [...(chats ?? [])];
-                const chatIndex = tmp.findIndex(
-                    (t) => t._id === selectedChat?._id,
-                );
-                tmp.splice(chatIndex, 1);
-                console.log(tmp);
-                setChats([...tmp]);
-                setSelectedChat(undefined);
-                onClose();
-                setLoading(false);
-                toast({
-                    title: "You left group successfully!",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-            } catch (e) {
-                console.log(e);
-                toast({
-                    title: "error Occurred!",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-                setLoading(false);
-            }
         };
-        const handleAddUser = async (user: User) => {
+        const handleAddUser = (user: User) => {
             if (selectedUsers.findIndex((x) => x._id === user._id) > -1) {
                 toast({
                     title: "user already selected!",
@@ -146,114 +153,131 @@ const UpdateGroupChatModal = () =>
                 });
                 return;
             }
-            try {
-                setLoading(true);
-                await axios.put(
-                    "api/chat/group/addMember",
+            setLoading(true);
+            selectedChat &&
+                addUserMutation(
                     {
-                        chatId: selectedChat?._id,
+                        chatId: selectedChat._id,
                         userId: user._id,
                     },
-                    config,
-                );
-                setSelectedUsers([...selectedUsers, user]);
-                setLoading(false);
-            } catch (e: unknown) {
-                console.log(e);
-                const errorMessage =
-                    (e as { response?: { data?: { message?: string } } })
-                        .response?.data?.message ?? "error Occurred!";
+                    {
+                        onSuccess: () => {
+                            setSelectedUsers([...selectedUsers, user]);
+                        },
+                        onError: (e: unknown) => {
+                            const errorMessage =
+                                (
+                                    e as {
+                                        response?: {
+                                            data?: { message?: string };
+                                        };
+                                    }
+                                ).response?.data?.message ?? "error Occurred!";
 
-                toast({
-                    title: errorMessage,
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-                setLoading(false);
-            }
+                            toast({
+                                title: errorMessage,
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onSettled: () => {
+                            setLoading(false);
+                        },
+                    },
+                );
         };
 
-        const handleDeleteUser = async (user: User) => {
-            try {
-                setLoading(true);
-                await axios.put(
-                    "api/chat/group/removeMember",
+        const handleDeleteUser = (user: User) => {
+            setLoading(true);
+            selectedChat &&
+                removeUserMutation(
                     {
-                        chatId: selectedChat?._id,
+                        chatId: selectedChat._id,
                         userId: user._id,
                     },
-                    config,
+                    {
+                        onSuccess: () => {
+                            const tmp = selectedUsers;
+                            tmp.splice(selectedUsers.indexOf(user), 1);
+                            setSelectedUsers([...tmp]);
+                            toast({
+                                title: "deleted successfully",
+                                status: "success",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onError: (e: unknown) => {
+                            const errorMessage =
+                                (
+                                    e as {
+                                        response?: {
+                                            data?: { message?: string };
+                                        };
+                                    }
+                                ).response?.data?.message ?? "error Occurred!";
+                            toast({
+                                title: errorMessage,
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onSettled: () => {
+                            setLoading(false);
+                        },
+                    },
                 );
-                const tmp = selectedUsers;
-                tmp.splice(selectedUsers.indexOf(user), 1);
-                setSelectedUsers([...tmp]);
-                setLoading(false);
-                toast({
-                    title: "deleted successfully",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-            } catch (e) {
-                console.log(e);
-                const errorMessage =
-                    (e as { response?: { data?: { message?: string } } })
-                        .response?.data?.message ?? "error Occurred!";
-                toast({
-                    title: errorMessage,
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-                setLoading(false);
-            }
         };
 
-        const handleRename = async () => {
+        const handleRename = () => {
             if (!groupChatName) {
                 return;
             }
-            try {
-                setLoading(true);
-                const { data } = await axios.put<Chat>(
-                    "/api/chat/group/rename",
+            setLoading(true);
+            selectedChat &&
+                renameGroupMutation(
                     {
-                        chatId: selectedChat?._id,
+                        chatId: selectedChat._id,
                         chatName: groupChatName,
                     },
-                    config,
+                    {
+                        onSuccess: (data) => {
+                            setSelectedChat(data);
+                            let chatsTmp = [...chats];
+                            chatsTmp = chatsTmp.map((chat) =>
+                                chat._id === selectedChat._id
+                                    ? { ...chat, chatName: groupChatName }
+                                    : { ...chat },
+                            );
+                            queryClient.setQueryData(["chats"], [...chatsTmp]);
+
+                            toast({
+                                title: "successfully updated!",
+                                status: "success",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onError: () => {
+                            toast({
+                                title: "error Occurred!",
+                                status: "error",
+                                duration: 5000,
+                                isClosable: true,
+                                position: "top-left",
+                            });
+                        },
+                        onSettled: () => {
+                            setLoading(false);
+                        },
+                    },
                 );
-                setSelectedChat(data);
-                let chatsTmp = [...(chats ?? [])];
-                chatsTmp = chatsTmp.map((chat) =>
-                    chat._id === selectedChat?._id
-                        ? { ...chat, chatName: groupChatName }
-                        : { ...chat },
-                );
-                setChats([...chatsTmp]);
-                toast({
-                    title: "successfully updated!",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-                setLoading(false);
-            } catch (e) {
-                console.log(e);
-                toast({
-                    title: "error Occurred!",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-left",
-                });
-                setLoading(false);
-            }
         };
         return (
             <>
@@ -289,9 +313,9 @@ const UpdateGroupChatModal = () =>
                             >
                                 {selectedUsers.map((user) => (
                                     <UserBadgeItem
-                                        handleDeleteUser={() =>
-                                            void handleDeleteUser(user)
-                                        }
+                                        handleDeleteUser={() => {
+                                            handleDeleteUser(user);
+                                        }}
                                         user={user}
                                         key={user._id}
                                     />
@@ -309,7 +333,9 @@ const UpdateGroupChatModal = () =>
                                     />
                                     <InputRightElement width={"4.5em"}>
                                         <Button
-                                            onClick={() => void handleRename()}
+                                            onClick={() => {
+                                                handleRename();
+                                            }}
                                             bg={"#02898e"}
                                             color={"white"}
                                             _hover={{ bg: "#01767a" }}
@@ -334,17 +360,15 @@ const UpdateGroupChatModal = () =>
                             {loading ? (
                                 <Spinner />
                             ) : (
-                                searchResult
-                                    .slice(0, 4)
-                                    .map((user) => (
-                                        <UserListItem
-                                            key={user._id}
-                                            user={user}
-                                            handleFunction={() =>
-                                                void handleAddUser(user)
-                                            }
-                                        />
-                                    ))
+                                searchResult.slice(0, 4).map((user) => (
+                                    <UserListItem
+                                        key={user._id}
+                                        user={user}
+                                        handleFunction={() => {
+                                            handleAddUser(user);
+                                        }}
+                                    />
+                                ))
                             )}
                         </ModalBody>
 
@@ -353,7 +377,9 @@ const UpdateGroupChatModal = () =>
                                 isLoading={loading}
                                 colorScheme="red"
                                 mr={3}
-                                onClick={() => void handleLeaveGroup()}
+                                onClick={() => {
+                                    handleLeaveGroup();
+                                }}
                             >
                                 Leave Group
                             </Button>

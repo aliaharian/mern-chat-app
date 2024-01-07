@@ -1,35 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatState } from "../context/chatState";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
-import axios from "axios";
 import { Add } from "iconsax-react";
 import ChatLoading from "./ChatLoading.tsx";
 import { getSender } from "../config/chatLogics";
 import GroupChatModal from "./misc/GroupChatModal";
 import PropTypes from "prop-types";
-import { Chat, User } from "../types/types.ts";
+import { User } from "../types/types.ts";
+import { useFetchChats } from "../query/chat/hooks.ts";
 
-const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
+const MyChats = () => {
     const [loggedUser, setLoggedUser] = useState<User>();
-    const { user, selectedChat, setChats, chats, setSelectedChat } =
-        ChatState();
+    const { selectedChat, setSelectedChat } = ChatState();
     const toast = useToast();
+    const { data: chats, isError } = useFetchChats();
 
-    const config = useMemo(
-        () => ({
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user?.token}`,
-            },
-        }),
-        [user?.token],
-    );
-    const fetchChats = async () => {
-        try {
-            const { data } = await axios.get<Chat[]>("/api/chat", config);
-            setChats(data);
-        } catch (e) {
-            console.log(e);
+    useEffect(() => {
+        isError &&
             toast({
                 title: "error Occurred!",
                 status: "error",
@@ -37,28 +24,14 @@ const MyChats = ({ fetchAgain }: { fetchAgain: boolean }) => {
                 isClosable: true,
                 position: "top-left",
             });
-        }
-    };
-
-    const fetchChatsCallback = useCallback(fetchChats, [
-        config,
-        setChats,
-        toast,
-    ]);
+    }, [isError, toast]);
 
     useEffect(() => {
-        fetchChatsCallback()
-            .then(() => {
-                setLoggedUser(
-                    JSON.parse(
-                        localStorage.getItem("userInfo") ?? "{}",
-                    ) as User,
-                );
-            })
-            .catch((e: unknown) => {
-                console.log(e);
-            });
-    }, [fetchAgain, fetchChatsCallback]);
+        chats &&
+            setLoggedUser(
+                JSON.parse(localStorage.getItem("userInfo") ?? "{}") as User,
+            );
+    }, [chats]);
 
     return (
         <Box

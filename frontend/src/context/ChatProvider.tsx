@@ -14,8 +14,6 @@ interface ChatContextType {
     setUser: Dispatch<SetStateAction<User | undefined>>;
     selectedChat: Chat | undefined;
     setSelectedChat: Dispatch<SetStateAction<Chat | undefined>>;
-    chats: Chat[] | undefined;
-    setChats: Dispatch<SetStateAction<Chat[]>>;
     notifications: Message[] | undefined;
     setNotifications: Dispatch<SetStateAction<Message[]>>;
 }
@@ -29,10 +27,6 @@ export const ChatContext = createContext<ChatContextType>({
     setSelectedChat: () => {
         console.log("selecting current chat");
     },
-    chats: undefined,
-    setChats: () => {
-        console.log("selecting chats");
-    },
     notifications: undefined,
     setNotifications: () => {
         console.log("selecting notifications");
@@ -42,7 +36,6 @@ export const ChatContext = createContext<ChatContextType>({
 const ChatProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User>();
     const [selectedChat, setSelectedChat] = useState<Chat>();
-    const [chats, setChats] = useState<Chat[]>([]);
     const [notifications, setNotifications] = useState<Message[]>([]);
     const history = useHistory();
 
@@ -64,8 +57,6 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
                 setUser,
                 selectedChat,
                 setSelectedChat,
-                chats,
-                setChats,
                 notifications,
                 setNotifications,
             }}
