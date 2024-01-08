@@ -8,6 +8,7 @@
     "start": "nodemon backend/server.js",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "lint-fix": "eslint --ext .js,.jsx,.ts,.tsx . --fix",
+    "lint-dev": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0 --debug",
     "prepare": "husky install"
   },
   "author": "aliaharian",
@@ -32,7 +33,8 @@
     "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.0",
     "lint-staged": "^15.2.0",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "webdriverio": "^8.27.0"
   },
   "config": {
     "commitizen": {

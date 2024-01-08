@@ -1,8 +1,13 @@
 import { Box } from "@chakra-ui/react";
 import { CloseCircle } from "iconsax-react";
 import PropTypes from "prop-types";
+import { User } from "../../types/types";
 
-const UserBadgeItem = ({ user, handleDeleteUser }) => {
+interface UserBadgeItemProps {
+    user: User;
+    handleDeleteUser: () => void;
+}
+const UserBadgeItem = ({ user, handleDeleteUser }: UserBadgeItemProps) => {
     return (
         <Box
             display={"flex"}

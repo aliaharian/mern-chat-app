@@ -8,16 +8,19 @@ import {
     Tabs,
     Text,
 } from "@chakra-ui/react";
-import Login from "../components/authentication/Login.jsx";
-import Signup from "../components/authentication/Signup.jsx";
+import Login from "../components/authentication/Login.tsx";
+import Signup from "../components/authentication/Signup.tsx";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
+import { User } from "../types/types.ts";
 
 const HomePage = () => {
     const history = useHistory();
     useEffect(() => {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        if (userInfo) {
+        const userInfo: User = JSON.parse(
+            localStorage.getItem("userInfo") ?? "{}",
+        ) as User;
+        if (userInfo.token) {
             history.push("/chats");
         }
     }, [history]);
@@ -39,7 +42,7 @@ const HomePage = () => {
                     fontFamily={"Work Sans"}
                     textAlign={"center"}
                 >
-                    chat app
+                    Echo Talk!
                 </Text>
             </Box>
             <Box
@@ -51,8 +54,12 @@ const HomePage = () => {
             >
                 <Tabs variant={"soft-rounded"} w={"100%"}>
                     <TabList mb={1}>
-                        <Tab w={"50%"}>Login</Tab>
-                        <Tab w={"50%"}>Signup</Tab>
+                        <Tab w={"50%"} aria-label="login-btn">
+                            Login
+                        </Tab>
+                        <Tab w={"50%"} aria-label="signup-btn">
+                            Signup
+                        </Tab>
                     </TabList>
                     <TabPanels>
                         <TabPanel>

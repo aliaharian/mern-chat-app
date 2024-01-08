@@ -1,15 +1,16 @@
 import ScrollableFeed from "react-scrollable-feed";
 import { Avatar, Box, Tooltip } from "@chakra-ui/react";
-import { isLastMessage, isSameSender } from "../config/chatLogics.js";
-import { ChatState } from "../context/chatState.js";
+import { isLastMessage, isSameSender } from "../config/chatLogics";
+import { ChatState } from "../context/chatState";
 import PropTypes from "prop-types";
+import { Message } from "../types/types";
 
-const ScrollableChats = ({ messages }) => {
+const ScrollableChats = ({ messages }: { messages?: Message[] }) => {
     const { user } = ChatState();
     return (
         <ScrollableFeed>
-            {messages &&
-                messages.map((message, index) => (
+            {user &&
+                messages?.map((message, index) => (
                     <Box
                         mb={
                             isSameSender(messages, message, index, user._id)
@@ -32,7 +33,7 @@ const ScrollableChats = ({ messages }) => {
                                     size={"sm"}
                                     cursor={"pointer"}
                                     name={message.sender.name}
-                                    src={message.sender.pic}
+                                    src={message.sender.pic ?? ""}
                                 />
                             </Tooltip>
                         )}

@@ -9,8 +9,8 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import axios from "axios";
 import { useHistory } from "react-router-dom";
+import { useSignup } from "../../query/user/hooks";
 
 const Signup = () => {
     const [name, setName] = useState("");
@@ -22,7 +22,8 @@ const Signup = () => {
     const [loading, setLoading] = useState(false);
     const toast = useToast();
     const history = useHistory();
-    const postDetails = (pics) => {
+    const { mutate, loading: apiLoading } = useSignup();
+    const postDetails = (pics?: File) => {
         setLoading(true);
         if (pics === undefined) {
             toast({
@@ -45,7 +46,7 @@ const Signup = () => {
                 body: data,
             })
                 .then((res) => res.json())
-                .then((data) => {
+                .then((data: { url: string }) => {
                     setPic(data.url.toString());
                     toast({
                         title: "avatar uploaded successfully",
@@ -78,66 +79,29 @@ const Signup = () => {
             setLoading(false);
         }
     };
-    const handleSubmit = async () => {
-        setLoading(true);
-        if (!name || !password || !confirmPassword || !email) {
-            toast({
-                title: "please fill all the fields",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            setLoading(false);
-            return;
-        }
-        if (password !== confirmPassword) {
-            toast({
-                title: "password is not equal with confirm password",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            setLoading(false);
-            return;
-        }
-        try {
-            const config = {
-                headers: {
-                    "Content-Type": "application/json",
+    const handleSubmit = () => {
+        mutate(
+            {
+                name,
+                email,
+                password,
+                confirmPassword,
+                pic,
+            },
+            {
+                onSuccess: (data) => {
+                    localStorage.setItem("userInfo", JSON.stringify(data));
+                    toast({
+                        title: "registration successful",
+                        status: "success",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "bottom",
+                    });
+                    history.push("/chats");
                 },
-            };
-            const { data } = await axios.post(
-                "/api/user",
-                {
-                    name,
-                    email,
-                    password,
-                    pic,
-                },
-                config,
-            );
-            toast({
-                title: "registration successful",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            localStorage.setItem("userInfo", JSON.stringify(data));
-            setLoading(false);
-            history.push("/chats");
-        } catch (e) {
-            toast({
-                title: e.response.data.message,
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            setLoading(false);
-        }
+            },
+        );
     };
     return (
         <VStack spacing={"5px"}>
@@ -210,15 +174,16 @@ const Signup = () => {
                 <Input
                     type={"file"}
                     onChange={(e) => {
-                        postDetails(e.target.files[0]);
+                        postDetails(e.target.files?.[0]);
                     }}
                 />
             </FormControl>
             <Button
-                isLoading={loading}
+                isLoading={loading || apiLoading}
                 mt={4}
                 colorScheme={"blue"}
                 onClick={handleSubmit}
+                aria-label="signup-submit-form"
             >
                 Signup
             </Button>

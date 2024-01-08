@@ -1,34 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChatState } from "../context/chatState.js";
+import { useEffect, useState } from "react";
+import { ChatState } from "../context/chatState";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
-import axios from "axios";
 import { Add } from "iconsax-react";
-import ChatLoading from "./ChatLoading.jsx";
-import { getSender } from "../config/chatLogics.js";
-import GroupChatModal from "./misc/GroupChatModal.jsx";
+import ChatLoading from "./ChatLoading.tsx";
+import { getSender } from "../config/chatLogics";
+import GroupChatModal from "./misc/GroupChatModal";
 import PropTypes from "prop-types";
+import { User } from "../types/types.ts";
+import { useFetchChats } from "../query/chat/hooks.ts";
 
-const MyChats = ({ fetchAgain }) => {
-    const [loggedUser, setLoggedUser] = useState();
-    const { user, selectedChat, setChats, chats, setSelectedChat } =
-        ChatState();
+const MyChats = () => {
+    const [loggedUser, setLoggedUser] = useState<User>();
+    const { selectedChat, setSelectedChat } = ChatState();
     const toast = useToast();
+    const { data: chats, isError } = useFetchChats();
 
-    const config = useMemo(
-        () => ({
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
-            },
-        }),
-        [user.token],
-    );
-    const fetchChats = async () => {
-        try {
-            const { data } = await axios.get("/api/chat", config);
-            setChats(data);
-        } catch (e) {
-            console.log(e);
+    useEffect(() => {
+        isError &&
             toast({
                 title: "error Occurred!",
                 status: "error",
@@ -36,19 +24,14 @@ const MyChats = ({ fetchAgain }) => {
                 isClosable: true,
                 position: "top-left",
             });
-        }
-    };
-
-    const fetchChatsCallback = useCallback(fetchChats, [
-        config,
-        setChats,
-        toast,
-    ]);
+    }, [isError, toast]);
 
     useEffect(() => {
-        setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
-        fetchChatsCallback();
-    }, [fetchAgain, fetchChatsCallback]);
+        chats &&
+            setLoggedUser(
+                JSON.parse(localStorage.getItem("userInfo") ?? "{}") as User,
+            );
+    }, [chats]);
 
     return (
         <Box
@@ -96,7 +79,9 @@ const MyChats = ({ fetchAgain }) => {
                     <Stack overflowY={"scroll"}>
                         {chats.map((chat) => (
                             <Box
-                                onClick={() => setSelectedChat(chat)}
+                                onClick={() => {
+                                    setSelectedChat(chat);
+                                }}
                                 cursor={"pointer"}
                                 bg={
                                     selectedChat?._id === chat._id
@@ -114,7 +99,7 @@ const MyChats = ({ fetchAgain }) => {
                                 key={chat._id}
                             >
                                 <Text>
-                                    {!chat.isGroupChat
+                                    {loggedUser && !chat.isGroupChat
                                         ? getSender(loggedUser, chat.users).name
                                         : chat.chatName}
                                 </Text>

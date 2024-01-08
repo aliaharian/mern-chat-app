@@ -14,8 +14,16 @@ import {
 } from "@chakra-ui/react";
 import { Eye } from "iconsax-react";
 import PropTypes from "prop-types";
+import { User } from "../../types/types";
+import { ReactNode } from "react";
 
-const ProfileModal = ({ user, children }) => {
+const ProfileModal = ({
+    user,
+    children,
+}: {
+    user: User;
+    children?: ReactNode;
+}) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
@@ -23,7 +31,12 @@ const ProfileModal = ({ user, children }) => {
             {children ? (
                 <span onClick={onOpen}>{children}</span>
             ) : (
-                <IconButton display={"flex"} icon={<Eye />} onClick={onOpen} />
+                <IconButton
+                    aria-label="view"
+                    display={"flex"}
+                    icon={<Eye />}
+                    onClick={onOpen}
+                />
             )}
             <Modal size={"lg"} isCentered isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
@@ -46,8 +59,8 @@ const ProfileModal = ({ user, children }) => {
                         <Image
                             borderRadius={"full"}
                             boxSize={"150px"}
-                            src={user.pic}
-                            alr={user.name}
+                            src={user.pic ?? undefined}
+                            alt={user.name}
                         />
                         <Text
                             fontSize={{ base: "28px", md: "30px" }}
