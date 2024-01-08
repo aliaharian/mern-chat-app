@@ -58,7 +58,7 @@ const fetchChats = asyncHandler(async (req, res) => {
         path: "latestMessage.sender",
         select: "name pic email",
     });
-    res.status(200).send(isChat);
+    return req.gql ? isChat : res.status(200).send(isChat);
 });
 
 const createGroupChat = asyncHandler(async (req, res) => {

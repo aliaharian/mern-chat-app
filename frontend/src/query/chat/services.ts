@@ -1,10 +1,17 @@
 import axios from "axios";
 import { ApiError, Chat } from "../../types/types";
+import { FETCH_CHATS } from "./queries";
 
 const fetchChats = async () => {
     try {
-        const { data } = await axios.get<Chat[]>("/api/chat");
-        return data;
+        const {
+            data: {
+                data: { chats },
+            },
+        } = await axios.post<{ data: { chats: Chat[] } }>("/graphql", {
+            query: FETCH_CHATS,
+        });
+        return chats;
     } catch (error: unknown) {
         const err: ApiError = error as ApiError;
         throw new Error(err.response.data.message ?? "");

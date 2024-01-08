@@ -1,0 +1,33 @@
+type User {
+    _id: ID!
+    name: String!
+    email: String!
+    password: String
+    pic: String
+    token: String
+}
+type Message {
+    _id: ID
+    sender: User
+    content: String
+    chat: Chat
+}
+type Chat {
+    _id: ID
+    chatName: String
+    isGroupChat: Boolean
+    users: [User]
+    latestMessage: Message
+    groupAdmin: User
+    createdAt: String
+    updatedAt: String
+}
+type Query {
+    users(search: String): [User]
+    chats: [Chat]
+    messages(chatId: ID!): [Message]
+}
+
+type Subscription {
+    test(id: ID!): ID
+}
