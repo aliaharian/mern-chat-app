@@ -4,14 +4,46 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
-const { notFound, errorHandler } = require("./middlewares/errorMiddleware");
+const { errorHandler } = require("./middlewares/errorMiddleware");
 const path = require("path");
+const { typeDefs, resolvers } = require("./graphql/index");
+const http = require("http");
+const { ApolloServer } = require("@apollo/server");
+const {
+    ApolloServerPluginDrainHttpServer,
+} = require("@apollo/server/plugin/drainHttpServer");
+const { expressMiddleware } = require("@apollo/server/express4");
+
 require("colors");
+
+// app.use(graphql);
 
 dotenv.config();
 connectDB();
 const app = express();
+const httpServer = http.createServer(app);
+// initGraphql(app, httpServer);
 app.use(express.json());
+const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+});
+apolloServer.start().then(() => {
+    app.use(
+        "/graphql",
+        expressMiddleware(apolloServer, {
+            context: ({ req, res }) => {
+                req.gql = true;
+                return {
+                    req,
+                    res,
+                    next: () => {},
+                };
+            },
+        }),
+    );
+});
 
 const __dirname1 = path.resolve();
 
@@ -33,12 +65,18 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-app.use(notFound);
+// app.use(notFound);
 app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
 
-const server = app.listen(port, console.log(`live on ${port}`.yellow.bold));
+const server = app.listen(port, () => {
+    console.log(`live on ${port}`.yellow.bold);
+    // console.log(`graphql path is ${apServer.graphqlPath}`);
+    // console.log(
+    //     `🚀 Subscriptions ready at ws://localhost:${port}${server.subscriptionsPath}`,
+    // );
+});
 
 const io = require("socket.io")(server, {
     pingTimeout: 60000,

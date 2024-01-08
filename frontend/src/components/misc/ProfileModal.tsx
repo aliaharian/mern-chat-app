@@ -25,7 +25,6 @@ const ProfileModal = ({
     children?: ReactNode;
 }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-
     return (
         <>
             {children ? (
